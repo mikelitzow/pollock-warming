@@ -91,11 +91,6 @@ d4$weight <- 1000*d4$weight
 
 dat <- rbind(d1, d2, d3, d4)
 
-# # limit to known-age
-# 
-# drop <- is.na(dat$Age)
-# 
-# dat <- dat[!drop,]
 
 # get julian day
 temp <- dat %>%
@@ -111,21 +106,17 @@ unique(dat$year)
 
 hist(dat$julian) # looks right!
 
-# # drop age -0
-# dat <- dat %>%
-#   filter(Age > 0)
+
 
 ggplot(dat, aes(Age, weight)) +
   geom_point() +
   geom_smooth(method = "gam", formula = y ~ s(x, k = 4), se = F) +
   facet_wrap(~year)
 
+ggsave("./figs/acoustic_trawl_age_weight_all_fish.png", width = 8, height = 8, units = 'in')
+
 # becomes very age-truncated in recent years!
-# examine just age 1-10
-ggplot(dplyr::filter(dat, Age %in% 1:10), aes(Age, weight)) +
-  geom_point() +
-  geom_smooth(method = "gam", formula = y ~ s(x, k = 4), se = F) +
-  facet_wrap(~year)
+
 
 ggplot(dplyr::filter(dat, Age %in% 4:10), aes(Age, weight, color = as.factor(as.character(year)))) +
   geom_point(stroke = 0, size=0) +
@@ -133,140 +124,20 @@ ggplot(dplyr::filter(dat, Age %in% 4:10), aes(Age, weight, color = as.factor(as.
   coord_cartesian(ylim = c(200, 2200)) + 
   scale_color_viridis_d()
 
+ggsave("./figs/acoustic_weight_at_age_by_year.png", width = 7, height = 4, units = 'in')
+
 ggplot(dat, aes(Age)) +
   geom_histogram(bins = 23) +
   facet_wrap(~year, scale = "free_y")
 
+ggsave("./figs/acoustic_age_histogram_all_fish.png", width = 8, height = 6, units = 'in')
 # age structure collapsed (?!)
-
-# examine just spawning fish < 15 years old
-ggplot(filter(dat, maturity_table_3 == 4, Age < 15), aes(Age)) +
-  geom_histogram(bins = 23) +
-  facet_wrap(~year, scale = "free_y")
-
-# and weight of spawning fish
-ggplot(filter(dat, maturity_table_3 == 4), aes(weight)) +
-  geom_histogram() +
-  facet_wrap(~year, scale = "free_y")
-
-spawn.age <- dat %>%
-  filter(Age %in% 1:15, maturity_table_3 == 4)
-
-ggplot(spawn.age, aes(as.factor(Age), weight)) +
-  geom_violin() +
-  facet_wrap(~year)
-
-# mean and sd of spawning age by year
-spawn.summary <- spawn.age %>%
-  group_by(year) %>%
-  summarize(mean.age = mean(Age), sd.age = sd(Age)) %>%
-  pivot_longer(cols = - year) %>%
-  mutate(year = as.numeric(as.character(year)))
-
-ggplot(spawn.summary, aes(year, value)) +
-  geom_line() +
-  geom_point() + 
-  facet_wrap(~name, scales = "free_y", ncol=1)
-
-# spawn date
-spawn.all <- dat %>%
-  filter(maturity_table_3 == 4)
-
-ggplot(spawn.all, aes(julian)) +
-  geom_histogram(bins=20, fill = "dark grey", color = "black") + 
-  facet_wrap(~year, scales = "free_y") +
-  coord_cartesian(xlim = c(60, 90))
 
 # add sex 
 dat$sex.code <- if_else(dat$Sex == 1, 1,
                         if_else(dat$Sex == 2, 2,
                                 if_else(dat$Sex == "Male", 1, 
                                         ifelse(dat$Sex == "Female", 2, NA))))
-
-# fit an exploratory model to weight of spawners with age, sex, and year effects
-library(mgcv)
-
-spawn.age <- dat %>%
-  filter(Age %in% 1:20, maturity_table_3 == 4)
-
-spawn.age$year <- as.factor(as.character(spawn.age$year))
-spawn.age$sex.code <- as.factor(spawn.age$sex.code)
-
-mod1 <- gam(weight ~ s(Age, k = 4) + sex.code + year, na.action = "na.exclude",
-           data = spawn.age)
-
-summary(mod1)
-
-plot(mod1)
-
-mod2 <- gam(weight ~ s(Age, by = year, k = 4) + sex.code, na.action = "na.exclude",
-           data = spawn.age)
-
-summary(mod2)
-
-# save predicted values to plot
-age.range <- spawn.age %>%
-  group_by(year) %>%
-  summarise(min.age = min(Age),
-            max.age = max(Age))
-
-plot.pred <- data.frame()
-
-for(i in 1:nrow(age.range)){
-  temp.age <- seq(age.range$min.age[i],
-                   age.range$max.age[i],
-                   length.out = 100)
-  
-  temp <- data.frame(
-                     Age = temp.age,
-                     year = age.range$year[i],
-                     sex.code = 2)
-  plot.pred <- rbind(plot.pred, temp)
-  
-}
-
-plot.pred$pred.weight <- predict(mod2, type = "response", newdata = plot.pred)
-
-ggplot(plot.pred, aes(Age, pred.weight, color = year)) +
-  geom_line() +
-  scale_color_viridis_d()
-
-
-## look at weight distributions by age;
-## include spawning and pre-spawning for now
-
-spawn.prespawn  <- dat %>%
-  filter(maturity_table_3 %in% 3:4, 
-         Age %in% 1:20)
-
-ggplot(spawn.prespawn, aes(weight)) +
-  geom_histogram(fill = "grey90", color="black") + 
-  facet_wrap(~Age, scale = "free_y")
-
-# so, few that are under 4 or older than 10
-# and the distributions are definitely skewed
-
-# I'll look at the numbers for both spawning and prespawning separately
-ggplot(filter(spawn.prespawn, maturity_table_3 == 3), aes(weight)) +
-  geom_histogram(fill = "grey90", color="black") + 
-  facet_wrap(~Age, scale = "free_y")
-
-ggplot(filter(spawn.prespawn, maturity_table_3 == 4), aes(weight)) +
-  geom_histogram(fill = "grey90", color="black") + 
-  facet_wrap(~Age, scale = "free_y")
-
-# 4-8 might capture most of the population
-
-# look at counts per year
-ggplot(filter(spawn.prespawn, maturity_table_3 == 3,
-              Age %in% 4:10), aes(Age)) +
-  geom_histogram(fill = "grey90", color="black") + 
-  facet_wrap(~year, scale = "free_y")
-
-ggplot(filter(spawn.prespawn, maturity_table_3 == 4,
-              Age %in% 4:10), aes(Age)) +
-  geom_histogram(fill = "grey90", color="black") + 
-  facet_wrap(~year, scale = "free_y")
 
 # not many spawner samples in some years - 2000-2003, 2009, 2012
 
@@ -300,7 +171,10 @@ plot.mature <- mature %>%
 ggplot(plot.mature, aes(as.numeric(as.character(year)), value)) +
   geom_point() +
   geom_line() +
-  facet_wrap(~name, scales = "free_y", ncol = 1)
+  facet_wrap(~name, scales = "free_y", ncol = 1) +
+  labs(x = "year")
+
+ggsave("./figs/proportion_mature_developing-spent_by_year.png", width = 8, height = 6, units = 'in')
 
 # now need to scale weights by age and maturity stage
 
@@ -316,6 +190,8 @@ mature.weights <- dat %>%
 ggplot(mature.weights, aes(weight)) +
   geom_histogram(fill = "dark grey", color = "black") +
   facet_grid(maturity_table_3~Age, scales = "free")
+
+ggsave("./figs/acoustic_age_stage_histograms.png", width = 8, height = 6, units = 'in')
 
 # few individuals at some age-maturity combinations - this may be 
 # important to understanding some of the age class dynamics
@@ -361,19 +237,17 @@ ggplot(mature.weights, aes(Age)) +
 
 # load covariates
 
-d1 <- read.csv("./data/western.goa.sst.csv")
-d2 <- read.csv("./data/pollock_SSB_2020_SAFE.csv")
+sst <- read.csv("./data/western.goa.sst.csv")
+ssb <- read.csv("./data/pollock_SSB_2020_SAFE.csv")
 
 # add to mature weights (and simplify)
 
 all.dat <- mature.weights %>%
   select(-DateTime, -Sex)
 
-all.dat <- left_join(all.dat, d1)
-all.dat <- left_join(all.dat, d2)
+all.dat <- left_join(all.dat, sst)
+all.dat <- left_join(all.dat, ssb)
 str(all.dat)
-
-library(fRegression)
 
 all.dat$maturity <- as.factor(as.character(all.dat$maturity_table_3))
 all.dat$sex.code <- as.factor(all.dat$sex.code)
@@ -382,7 +256,6 @@ ggplot(all.dat, aes(nov.feb.wSST, sc.weight)) +
   geom_point() +
   facet_wrap(~Age) +
   geom_smooth(method = "gam", formula = y ~ s(x, k=4))
-
 
 ggplot(all.dat, aes(year, sc.weight)) +
   geom_point() +
@@ -406,44 +279,19 @@ ggplot(dplyr::filter(all.dat, Age %in% 4:10, year.class %in% 1979:2013),
   coord_cartesian(ylim = c(200, 2200)) + 
   scale_color_viridis_d()
 
-m1 <- gamm(weight ~  maturity + sex.code + Age +
-             s(nov.feb.wSST, k = 4) + s(poll.SSB.2020, k = 4),
-           random = list(year.class=~1), data=all.dat) 
+ggsave("./figs/acoustic_weight_at_age_by_year_class.png", width = 7, height = 4, units = 'in')
 
-summary(m1$gam)
-plot(m1$gam)
-
-
-all.dat$era <- as.factor(if_else(all.dat$year < 2005, 1,
-                       if_else(all.dat$year %in% 2006:2015, 2, 3)))
-
-m2 <- gamm(weight ~  maturity + sex.code + Age +
-             s(nov.feb.wSST, k = 4, by = era) + s(poll.SSB.2020, k = 4),
-           random = list(year.class=~1), data=all.dat) 
-
-summary(m2$gam)
-plot(m2$gam)
-
-
-m3 <- gamm(weight ~  maturity + sex.code + Age +
-             s(nov.feb.wSST, k = 4) + s(poll.SSB.2020, k = 4, by = era),
-           random = list(year.class=~1), data=all.dat) 
-
-summary(m3$gam)
-plot(m3$gam)
-
-mod.out <- MuMIn::AICc(m1, m2, m3)
-
-mod.out$delta.AICc <- mod.out$AICc - min(mod.out$AICc)
-
-mod.out
+# question - do density-dependence and SST explain changing weight at age?
+# begin model selection
+# using year class as a random term in this first iteration;
+# should also consider adding haul nested in year as a random term
+library(mgcv)
 
 # add lagged spring/summer temps
+sst <- read.csv("./data/western.goa.sst.csv")
+head(sst)
 
-d1 <- read.csv("./data/western.goa.sst.csv")
-head(d1)
-
-lagged.temp <- d1 %>%
+lagged.temp <- sst %>%
   select(-nov.feb.wSST) %>%
   mutate(year=year+1)
 
@@ -451,97 +299,233 @@ names(lagged.temp)[2] <- "apr.jul.wSST.lag1"
 
 all.dat <- left_join(all.dat, lagged.temp)
 
-# repeat models m1-m3 with lagged spring/summer temp instead of winter temp
-m4 <- gamm(weight ~  maturity + sex.code + Age +
-             s(apr.jul.wSST.lag1, k = 4) + s(poll.SSB.2020, k = 4),
+m1 <- gamm(log.weight ~  maturity + sex.code + Age + s(nov.feb.wSST, k = 4) + s(poll.SSB.2020, k = 4),
+           random = list(year.class=~1), data=all.dat) 
+
+summary(m1$gam)
+
+# plot(m1$gam)
+
+# do sst and density effects differ over time? I'll test with some ad-hoc era divisions
+all.dat$era <- as.factor(if_else(all.dat$year < 2005, 1,
+                       if_else(all.dat$year %in% 2006:2015, 2, 3)))
+
+m2 <- gamm(log.weight ~  maturity + sex.code + Age + te(nov.feb.wSST, year, k = 4) + s(poll.SSB.2020, k = 4),
+           random = list(year.class=~1), data=all.dat) 
+
+summary(m2$gam)
+vis.gam(m2$gam, view=c("year", "nov.feb.wSST"),
+        plot.type='contour', color='topo', type = "response")
+# plot(m2$gam)
+
+m3 <- gamm(log.weight ~  maturity + sex.code + Age + s(nov.feb.wSST, k = 4) + te(poll.SSB.2020, year, k = 4),
+           random = list(year.class=~1), data=all.dat) 
+
+summary(m3$gam)
+
+vis.gam(m3$gam, view=c("year", "poll.SSB.2020"),
+        plot.type='contour', color='topo', type = "response")
+
+m4 <- gamm(log.weight ~  maturity + sex.code + Age + te(nov.feb.wSST, year, k = 4) + te(poll.SSB.2020, year, k = 4),
            random = list(year.class=~1), data=all.dat) 
 
 summary(m4$gam)
-plot(m4$gam)
 
-m5 <- gamm(weight ~  maturity + sex.code + Age +
-             s(apr.jul.wSST.lag1, k = 4, by = era) + s(poll.SSB.2020, k = 4),
+png("./figs/acoustic_m4_vis.gam.png", 8, 4, units="in", res=300)
+par(mfrow=c(1,2))
+
+vis.gam(m4$gam, view=c("year", "poll.SSB.2020"),
+        plot.type='contour', color='topo', type = "response")
+
+vis.gam(m4$gam, view=c("year", "nov.feb.wSST"),
+        plot.type='contour', color='topo', type = "response")
+
+dev.off()
+
+m5 <- gamm(log.weight ~  maturity + sex.code + Age + te(nov.feb.wSST, poll.SSB.2020, k = 4),
            random = list(year.class=~1), data=all.dat) 
 
 summary(m5$gam)
-plot(m5$gam)
 
-m6 <- gamm(weight ~  maturity + sex.code + Age +
-             s(apr.jul.wSST.lag1, k = 4) + s(poll.SSB.2020, k = 4, by = era),
+vis.gam(m5$gam, view=c("nov.feb.wSST", "poll.SSB.2020"),
+        plot.type='contour', color='topo', type = "response")
+
+# compare with april-july sst
+
+m6 <- gamm(log.weight ~  maturity + sex.code + Age + s(apr.jul.wSST.lag1, k = 4) + s(poll.SSB.2020, k = 4),
            random = list(year.class=~1), data=all.dat) 
 
 summary(m6$gam)
-plot(m6$gam)
 
-mod.out <- MuMIn::AICc(m1, m2, m3, m4, m5, m6)
+# plot(m6$gam)
 
-mod.out$delta.AICc <- mod.out$AICc - min(mod.out$AICc)
-
-mod.out # lagged spring-summer temperatures are much better!
-
-# does the class of temperature drive density dependence?
-
-ggplot(all.dat, aes(year, apr.jul.wSST.lag1)) +
-  geom_point() +
-  geom_line()
-
-hist(unique(all.dat$apr.jul.wSST.lag1))
-
-
-all.dat$sst.class <- as.factor(if_else(all.dat$apr.jul.wSST.lag1 < 7, 1,
-                             if_else(all.dat$apr.jul.wSST.lag1 > 8, 3, 2)))
-
-
-m7 <- gamm(weight ~  maturity + sex.code + Age + s(poll.SSB.2020, k = 4, by = sst.class),
+m7 <- gamm(log.weight ~  maturity + sex.code + Age + te(apr.jul.wSST.lag1, year, k = 4) + s(poll.SSB.2020, k = 4),
            random = list(year.class=~1), data=all.dat) 
 
 summary(m7$gam)
-plot(m7$gam)
 
-mod.out <- MuMIn::AICc(m1, m2, m3, m4, m5, m6, m7)
+vis.gam(m7$gam, view=c("year", "apr.jul.wSST.lag1"),
+        plot.type='contour', color='topo', type = "response")
 
-mod.out$delta.AICc <- mod.out$AICc - min(mod.out$AICc)
+# plot(m7$gam)
 
-mod.out # m7 is not very good!
-
-m8 <- gamm(weight ~  maturity + sex.code + Age +
-             s(apr.jul.wSST.lag1, k = 4, by = era) + s(poll.SSB.2020, k = 4, by = era),
+m8 <- gamm(log.weight ~  maturity + sex.code + Age + s(apr.jul.wSST.lag1, k = 4) + te(poll.SSB.2020, year, k = 4),
            random = list(year.class=~1), data=all.dat) 
 
 summary(m8$gam)
-plot(m8$gam)
 
-mod.out <- MuMIn::AICc(m1, m2, m3, m4, m5, m6, m7, m8)
+vis.gam(m8$gam, view=c("year", "poll.SSB.2020"),
+        plot.type='contour', color='topo', type = "response")
 
-mod.out$delta.AICc <- mod.out$AICc - min(mod.out$AICc)
-
-mod.out # mod 8 is best by a mile
-
-ggplot(all.dat, aes(poll.SSB.2020, apr.jul.wSST.lag1)) +
-  geom_point() +
-  facet_wrap(~era)
-
-m9 <- gamm(weight ~  maturity + sex.code + Age +
-             te(apr.jul.wSST.lag1, poll.SSB.2020, k = 4),
+m9 <- gamm(log.weight ~  maturity + sex.code + Age + te(apr.jul.wSST.lag1, year, k = 4) + te(poll.SSB.2020, year, k = 4),
            random = list(year.class=~1), data=all.dat) 
 
 summary(m9$gam)
-plot(m9$gam)
 
-mod.out <- MuMIn::AICc(m1, m2, m3, m4, m5, m6, m7, m8, m9)
+png("./figs/acoustic_m9_vis.gam.png", 8, 4, units="in", res=300)
+par(mfrow=c(1,2))
+
+vis.gam(m9$gam, view=c("year", "poll.SSB.2020"),
+        plot.type='contour', color='topo', type = "response")
+
+vis.gam(m9$gam, view=c("year", "apr.jul.wSST.lag1"),
+        plot.type='contour', color='topo', type = "response")
+
+dev.off()
+
+m10 <- gamm(log.weight ~  maturity + sex.code + Age + te(apr.jul.wSST.lag1, poll.SSB.2020, k = 4),
+           random = list(year.class=~1), data=all.dat) 
+
+summary(m10$gam)
+
+vis.gam(m10$gam, view=c("apr.jul.wSST.lag1", "poll.SSB.2020"),
+        plot.type='contour', color='topo', type = "response")
+
+mod.out <- MuMIn::AICc(m1, m2, m3, m4, m5, m6, m7, m8, m9, m10)
 
 mod.out$delta.AICc <- mod.out$AICc - min(mod.out$AICc)
 
-mod.out # m9 isn't so good
+mod.out$formula <- c(as.character(m1$gam$formula)[3],
+                     as.character(m2$gam$formula)[3],
+                     as.character(m3$gam$formula)[3],
+                     as.character(m4$gam$formula)[3],
+                     as.character(m5$gam$formula)[3],
+                     as.character(m6$gam$formula)[3],
+                     as.character(m7$gam$formula)[3],
+                     as.character(m8$gam$formula)[3],
+                     as.character(m9$gam$formula)[3],
+                     as.character(m10$gam$formula)[3])
 
-vis.gam(m9$gam, view=c("apr.jul.wSST.lag1", "poll.SSB.2020"),
-        plot.type='contour', color='topo')
+mod.out <- mod.out %>%
+  select(formula, df, AICc, delta.AICc) %>%
+  arrange(delta.AICc)
+
+mod.out
+
+write.csv(mod.out, "./output/acoustic_trawl_first_model_comparison.csv")
 
 
-ggplot(dplyr::filter(all.dat, Age %in% 4:10, year.class %in% 1979:2013),
-       aes(poll.SSB.2020, sc.weight)) +
-  geom_point() +
-  geom_smooth(method = "lm") +
-  facet_wrap(~year.class)
+## I'm not sure that any of the above makes sense!
+## the tensor products on year impose a pure time effect, not accounted for by SST or SSB,
+## that we don't want at all!
 
+# try a model-fitting approach with different possible changepoints
+
+range(all.dat$year)
+.2*length(1986:2020)
+
+mod.out <- NA
+
+for(i in 2000:2005){
   
+  all.dat$era <- as.factor(if_else(all.dat$year <= i, 1, 2))
+  
+  mod <- gamm(log.weight ~  maturity + sex.code + Age +
+                s(nov.feb.wSST, k = 4, by = era) + s(poll.SSB.2020, k = 4, by = era),
+              random = list(year.class=~1), data=all.dat) 
+  
+  mod.out <- rbind(mod.out, data.frame(threshold = i,
+                                       SST = "winter",
+                                       AICc = MuMIn::AICc(mod)))
+  
+}
+
+# and spring/summer sst
+
+for(i in 2000:2005){
+  
+  all.dat$era <- as.factor(if_else(all.dat$year <= i, 1, 2))
+  
+  mod <- gamm(log.weight ~  maturity + sex.code + Age +
+                s(apr.jul.wSST.lag1, k = 4, by = era) + s(poll.SSB.2020, k = 4, by = era),
+              random = list(year.class=~1), data=all.dat) 
+  
+  mod.out <- rbind(mod.out, data.frame(threshold = i,
+                                       SST = "spring/summer",
+                                       AICc = MuMIn::AICc(mod)))
+  
+}
+
+
+# and stationary models for comparison
+
+st.spring <- gamm(log.weight ~  maturity + sex.code + Age +
+                    s(apr.jul.wSST.lag1, k = 4) + s(poll.SSB.2020, k = 4),
+                  random = list(year.class=~1), data=all.dat) 
+
+st.winter <- gamm(log.weight ~  maturity + sex.code + Age +
+                    s(nov.feb.wSST, k = 4) + s(poll.SSB.2020, k = 4),
+                  random = list(year.class=~1), data=all.dat) 
+
+# add palette 
+
+cb <- cb <- c("#999999", "#E69F00", "#56B4E9", "#009E73",
+              "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
+ggplot(mod.out, aes(threshold, AICc, color = SST)) +
+  geom_line() +
+  scale_color_manual(values = cb[c(2,4)]) +
+  geom_hline(yintercept = c(MuMIn::AICc(st.spring), MuMIn::AICc(st.winter)),
+             lty = 2, color = cb[c(2,4)])
+
+ggsave("./figs/acoustic_threshold_AICc.png", width = 6, height = 4, units = "in")
+
+# plot best model!
+
+mod.out[which.min(mod.out$AICc),]
+
+all.dat$era <- as.factor(if_else(all.dat$year <= 2000, 1, 2))
+
+mod <- gamm(log.weight ~  maturity + sex.code + Age +
+              s(nov.feb.wSST, k = 4, by = era) + s(poll.SSB.2020, k = 4, by = era),
+            random = list(year.class=~1), data=all.dat) 
+
+summary(mod$gam)
+
+png("./figs/acoustic_winter.sst_2000_nonstationary_gam.png", 6, 6, 'in', res=300)
+plot(mod$gam, pages=1)
+dev.off()
+
+plot.dat <- all.dat %>%
+  group_by(year) %>%
+  summarise(winter.sst = mean(nov.feb.wSST),
+            ssb = mean(poll.SSB.2020)) %>%
+  mutate(era = if_else(year <= 2000, "1986-2000", "2001-2020")) 
+
+ggplot(plot.dat, aes(winter.sst)) +
+  geom_histogram(bins=5, fill= "grey", color="black") +
+  facet_grid(~era)
+
+ggsave("./figs/acoustic_winter_sst_era_histograms.png", width = 4, height = 4, units = 'in')
+
+ggplot(plot.dat, aes(ssb)) +
+  geom_histogram(bins=5, fill= "grey", color="black") +
+  facet_grid(~era)
+
+ggsave("./figs/acoustic_ssb_era_histograms.png", width = 4, height = 4, units = 'in')
+
+ggplot(plot.dat, aes(ssb, winter.sst)) +
+  geom_point() + 
+  facet_wrap(~era)
+
+ggsave("./figs/acoustic_ssb_sst_scatter_era.png", width = 4, height = 3, units = 'in')
