@@ -304,7 +304,7 @@ m1 <- gamm(log.weight ~  maturity + sex.code + Age + s(nov.feb.wSST, k = 4) + s(
 
 summary(m1$gam)
 
-# plot(m1$gam)
+plot(m1$gam)
 
 # do sst and density effects differ over time? I'll test with some ad-hoc era divisions
 all.dat$era <- as.factor(if_else(all.dat$year < 2005, 1,
