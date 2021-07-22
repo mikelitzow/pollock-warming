@@ -1,0 +1,11 @@
+"","formula","df","AICc","delta.AICc"
+"m9","maturity + sex.code + Age + te(apr.jul.wSST.lag1, year, k = 4) + te(poll.SSB.2020, year, k = 4)",15,4685.35892882239,0
+"m4","maturity + sex.code + Age + te(nov.feb.wSST, year, k = 4) + te(poll.SSB.2020, year, k = 4)",15,4922.85089863959,237.491969817202
+"m2","maturity + sex.code + Age + te(nov.feb.wSST, year, k = 4) + s(poll.SSB.2020, k = 4)",15,5290.7228511764,605.363922354009
+"m8","maturity + sex.code + Age + s(apr.jul.wSST.lag1, k = 4) + te(poll.SSB.2020, year, k = 4)",15,5339.29866623038,653.939737407985
+"m3","maturity + sex.code + Age + s(nov.feb.wSST, k = 4) + te(poll.SSB.2020, year, k = 4)",15,5464.12276229231,778.763833469915
+"m7","maturity + sex.code + Age + te(apr.jul.wSST.lag1, year, k = 4) + s(poll.SSB.2020, k = 4)",15,5513.33643064788,827.977501825488
+"m5","maturity + sex.code + Age + te(nov.feb.wSST, poll.SSB.2020, k = 4)",13,5544.50369652272,859.144767700324
+"m10","maturity + sex.code + Age + te(apr.jul.wSST.lag1, poll.SSB.2020, k = 4)",13,6138.0819537021,1452.72302487971
+"m6","maturity + sex.code + Age + s(apr.jul.wSST.lag1, k = 4) + s(poll.SSB.2020, k = 4)",12,6548.40519033725,1863.04626151486
+"m1","maturity + sex.code + Age + s(nov.feb.wSST, k = 4) + s(poll.SSB.2020, k = 4)",12,6616.64791722046,1931.28898839807
