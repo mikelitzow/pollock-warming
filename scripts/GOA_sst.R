@@ -13,6 +13,10 @@ library(oce)
 # script for calculating GOA sst anomalies wrt 1951-1980
 # download.file("https://coastwatch.pfeg.noaa.gov/erddap/griddap/nceiErsstv5.nc?sst[(1900-01-01):1:(2020-12-01T00:00:00Z)][(0.0):1:(0.0)][(54):1:(62)][(200):1:(226)]", "~temp")
 
+# 1980-2020 version
+# download.file("https://coastwatch.pfeg.noaa.gov/erddap/griddap/nceiErsstv5.nc?sst[(1980-01-01):1:(2020-12-01T00:00:00Z)][(0.0):1:(0.0)][(54):1:(62)][(200):1:(226)]", "~temp")
+
+
 # download.file("https://coastwatch.pfeg.noaa.gov/erddap/griddap/nceiErsstv5.nc?sst[(1947-01-01):1:(2021-5-01T00:00:00Z)][(0.0):1:(0.0)][(20):1:(68)][(120):1:(250)]", "~temp")
 
 # paste into browser for windows!
@@ -23,12 +27,17 @@ library(oce)
 
 nc <- nc_open("./data/nceiErsstv5_130f_00d5_4da1.nc")
 
+# 1980-2020 GOA version:
+nc <- nc_open("./data/nceiErsstv5_7676_409f_f7a3.nc")
+
 # process
 
 ncvar_get(nc, "time")   # seconds since 1-1-1970
 raw <- ncvar_get(nc, "time")
 h <- raw/(24*60*60)
 d <- dates(h, origin = c(1,1,1970))
+m <- months(d)
+yr <- years(d)
 
 x <- ncvar_get(nc, "longitude")
 y <- ncvar_get(nc, "latitude")
@@ -63,7 +72,6 @@ drop <- lon > 210 | lat < 56 | lat > 58
 wSST <- SST
 wSST[,drop] <- NA
 
-drop <- 
 
 # and check
 temp.mean <- colMeans(wSST, na.rm=T)
@@ -72,7 +80,31 @@ image.plot(x,y,z, col=oceColorsPalette(64), xlim=c(195,230), ylim=c(53,62))
 map('world2Hires',c('Canada', 'usa'), fill=T,xlim=c(130,250), ylim=c(20,66),add=T, lwd=1, col="lightyellow3")
 
 # calculate monthly anomaly
+# remove seasonal means
+f <- function(x) tapply(x, m, mean)  # function to compute monthly means for a single time series
+mu <- apply(wSST, 2, f)	# compute monthly means for each time series (cell)
+mu <- mu[rep(1:12, length(d)/12),]  # replicate means matrix for each year at each location
 
+anom <- wSST - mu   # compute matrix of anomalies
+
+# get rownames to calculate overall mean anomaly for each month
+SST.anom <- rowMeans(anom, na.rm = T)
+
+
+
+SST.anom <- data.frame(year = as.numeric(as.character(yr)),
+                       month = as.numeric(m), 
+                       anom = SST.anom)
+
+SST.anom$dec.yr = SST.anom$year + (SST.anom$month-0.5)/12
+
+ggplot(SST.anom, aes(dec.yr, anom)) +
+  geom_line()
+
+write.csv(SST.anom, "./data/monthly.western.GOA.SST.anomalies.wrt.1980-2020.csv")
+
+
+## below is old!
 wSST <- rowMeans(wSST, na.rm = T)
 
 # and Apr-July
