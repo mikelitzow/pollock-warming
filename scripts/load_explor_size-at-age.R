@@ -117,4 +117,32 @@ unique(dat$year)
 
 hist(dat$julian) # looks right!
 
+#limit to observations within range of interest by limiting longitude
+
+dat <- dat[which(dat$Longitude> -158 & dat$Longitude< -150),]
+
 #end data wrangling-----
+
+library("rnaturalearth")
+library("rnaturalearthdata")
+library( "ggspatial" )
+library("sf")
+
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+ggplot(data = world) +
+  geom_sf() +
+  coord_sf(xlim = c(-180, -145), ylim = c(53, 61), expand = TRUE) +
+  # annotation_scale(location = "bl", width_hint = 0.5) +
+  # annotation_north_arrow(location = "bl", which_north = "true", 
+  #                        pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+  #                        style = north_arrow_fancy_orienteering) +  
+  geom_point(aes(Longitude,Latitude,  col=year), data=dat) +   
+  scale_color_distiller(palette = "Spectral")
+
+
+
+
+
+
+
