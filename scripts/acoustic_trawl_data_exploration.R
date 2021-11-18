@@ -246,14 +246,29 @@ ggplot(spawn.prespawn, aes(weight)) +
 # so, few that are under 4 or older than 10
 # and the distributions are definitely skewed
 
-# I'll look at the numbers for both spawning and prespawning separately
-ggplot(filter(spawn.prespawn, maturity_table_3 == 3), aes(weight)) +
-  geom_histogram(fill = "grey90", color="black") + 
-  facet_wrap(~Age, scale = "free_y")
+# I'll look at the numbers for developing, spawning, prespawning, spent separately
+develop.spawn.prespawn.spent  <- dat %>%
+  filter(maturity_table_3 %in% 2:5, 
+         Age %in% 1:20)
 
-ggplot(filter(spawn.prespawn, maturity_table_3 == 4), aes(weight)) +
-  geom_histogram(fill = "grey90", color="black") + 
-  facet_wrap(~Age, scale = "free_y")
+ggplot(filter(develop.spawn.prespawn.spent, maturity_table_3 == 2), aes(as.factor(Age))) +
+  geom_histogram(fill = "grey90", color="black", stat = "count") + 
+  facet_wrap(~year, scale = "free_y")
+
+ggplot(filter(develop.spawn.prespawn.spent, maturity_table_3 == 3), aes(as.factor(Age))) +
+  geom_histogram(fill = "grey90", color="black", stat = "count") + 
+  facet_wrap(~year, scale = "free_y")
+
+ggplot(filter(develop.spawn.prespawn.spent, maturity_table_3 == 4), aes(as.factor(Age))) +
+  geom_histogram(fill = "grey90", color="black", stat = "count") + 
+  facet_wrap(~year, scale = "free_y")
+
+ggplot(filter(develop.spawn.prespawn.spent, maturity_table_3 == 2), aes(as.factor(Age))) +
+  geom_histogram(fill = "grey90", color="black", stat = "count") + 
+  facet_wrap(~year, scale = "free_y")
+
+## so all 4 classes look reasonable to include!
+
 
 # 4-8 might capture most of the population
 
@@ -301,6 +316,36 @@ ggplot(plot.mature, aes(as.numeric(as.character(year)), value)) +
   geom_point() +
   geom_line() +
   facet_wrap(~name, scales = "free_y", ncol = 1)
+
+## addition - use Shannon-Weiner to calculate age diversity of 
+# developing / pre-spawning / spawning / spent fish
+age.diversity <- dat %>%
+  filter(maturity_table_3 %in% 2:5,
+         Age > 1) %>%
+  group_by(year, Age) %>%
+  summarize(count = n()) 
+
+year.total <- age.diversity %>%
+  group_by(year) %>%
+  summarise(year.total = sum(count))
+
+age.diversity <- left_join(age.diversity, year.total) %>%
+  mutate(proportion = count / year.total,
+         ln.proportion = log(proportion),
+         product = proportion*ln.proportion)
+
+age.shannon <- age.diversity %>%
+  group_by(year) %>%
+  summarise(shannon = -sum(product))
+
+plot.shannon <- data.frame(year = 1986:2020,
+                           shannon = NA)
+
+plot.shannon$shannon <- age.shannon$shannon[match(plot.shannon$year, age.shannon$year)]
+
+ggplot(plot.shannon, aes(year, shannon)) +
+  geom_line() +
+  geom_point()
 
 # now need to scale weights by age and maturity stage
 
