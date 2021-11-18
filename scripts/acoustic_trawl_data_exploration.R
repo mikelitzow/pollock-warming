@@ -354,17 +354,40 @@ sst <- read.csv("./data/monthly.western.GOA.SST.anomalies.wrt.1980-2020.csv")
 # now cross-correlate sst-diversity
 
 # add winter year to sst
-sst$winter.yr <- ifelse(sst$month > 4, sst$year + 1, sst$year)
+sst$winter.yr <- ifelse(sst$month > 3, sst$year + 1, sst$year)
 
+# change "year" to "winter.yr" in age.shannon to match sst
+age.shannon <- age.shannon %>%
+  rename(winter.yr = year)
 
-♥for(i in 11:{
+sst.shannon <- left_join(age.shannon, sst)
+
+corrs.out <- data.frame()
+
+for(i in 1:12){
+ 
+  temp <- sst.shannon %>%
+    filter(month == i)
   
-  temp <- 
+  temp.out <- data.frame(month = i,
+                         cor = cor(temp$shannon, temp$anom))
   
-  
-  
+  corrs.out <- rbind(corrs.out, temp.out)
   
 }
+
+order <-  c(10:12, 1:9)
+corrs.out$month <- as.factor(corrs.out$month) 
+corrs.out$month <- reorder(corrs.out$month, order)
+
+ggplot(corrs.out, aes(month, cor)) +
+  geom_bar(stat = "identity", fill = "grey", color = "dark grey")
+
+## compare Shannon with months 1:12 in year before sampling
+
+
+
+
 
 # now need to scale weights by age and maturity stage
 
