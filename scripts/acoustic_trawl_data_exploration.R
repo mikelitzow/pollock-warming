@@ -347,6 +347,25 @@ ggplot(plot.shannon, aes(year, shannon)) +
   geom_line() +
   geom_point()
 
+
+# load sst as a covariate
+sst <- read.csv("./data/monthly.western.GOA.SST.anomalies.wrt.1980-2020.csv")
+
+# now cross-correlate sst-diversity
+
+# add winter year to sst
+sst$winter.yr <- ifelse(sst$month > 4, sst$year + 1, sst$year)
+
+
+♥for(i in 11:{
+  
+  temp <- 
+  
+  
+  
+  
+}
+
 # now need to scale weights by age and maturity stage
 
 # first, clean up - only known sex, known age, age 4-10,
