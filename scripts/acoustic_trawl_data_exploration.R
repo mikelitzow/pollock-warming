@@ -438,8 +438,44 @@ ggplot(cor.plot, aes(lag, cor)) +
   labs(x = "lag (months; 0 = March of sampling year",
        y = "SST - Shannon correlation")
 
+## average for the two years prior as covariate for age diversity
+
+sst.annual <- tapply(sst$anom, sst$year, mean)
+
+sst.annual <- data.frame(year = as.numeric(names(sst.annual)),
+                        sst = sst.annual,
+                        sst.2 = zoo::rollmean(sst.annual, 2, align = "right", fill = NA),
+                        sst.3 = zoo::rollmean(sst.annual, 3, align = "right", fill = NA))
 
 
+ggplot(sst.annual, aes(year, sst)) +
+  geom_line() + 
+  geom_point() +
+  geom_line(aes(year, sst.2), color = "red")
+
+
+sst.annual <- left_join(sst.annual, age.shannon)
+
+sst.annual <- sst.annual %>%
+  pivot_longer(cols = c(-year, -shannon))
+
+ggplot(sst.annual, aes(value, shannon)) +
+  geom_point() +
+  facet_wrap(~name)
+
+# compare predictive skill / model fit
+library(mgcv)
+
+sst.annual <- sst.annual %>%
+  pivot_wider(names_from = name)
+
+mod1 <- gam(shannon ~ s(sst, k = 4), data = sst.annual)
+mod2 <- gam(shannon ~ s(sst.2, k = 4), data = sst.annual)
+mod3 <- gam(shannon ~ s(sst.3, k = 4), data = sst.annual)
+
+MuMIn::AICc(mod1, mod2, mod3) # ain't no denying - mod3 best by far
+summary(mod3)
+plot(mod3, residuals = T, pch = 19)
 
 # now need to scale weights by age and maturity stage
 
