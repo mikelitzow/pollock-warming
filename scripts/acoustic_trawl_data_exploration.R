@@ -353,38 +353,90 @@ sst <- read.csv("./data/monthly.western.GOA.SST.anomalies.wrt.1980-2020.csv")
 
 # now cross-correlate sst-diversity
 
-# add winter year to sst
-sst$winter.yr <- ifelse(sst$month > 3, sst$year + 1, sst$year)
+sst$shannon <- ifelse(sst$month == 3, age.shannon$shannon[match(sst$year, age.shannon$year)], NA)
 
-# change "year" to "winter.yr" in age.shannon to match sst
-age.shannon <- age.shannon %>%
-  rename(winter.yr = year)
+sst$lag.neg.36 <- lag(sst$anom, 36)
+sst$lag.neg.35 <- lag(sst$anom, 35)
+sst$lag.neg.34 <- lag(sst$anom, 34)
+sst$lag.neg.33 <- lag(sst$anom, 33)
+sst$lag.neg.32 <- lag(sst$anom, 32)
+sst$lag.neg.31 <- lag(sst$anom, 31)
+sst$lag.neg.30 <- lag(sst$anom, 30)
+sst$lag.neg.29 <- lag(sst$anom, 29)
+sst$lag.neg.28 <- lag(sst$anom, 28)
+sst$lag.neg.27 <- lag(sst$anom, 27)
+sst$lag.neg.26 <- lag(sst$anom, 26)
+sst$lag.neg.25 <- lag(sst$anom, 25)
 
-sst.shannon <- left_join(age.shannon, sst)
+sst$lag.neg.24 <- lag(sst$anom, 24)
+sst$lag.neg.23 <- lag(sst$anom, 23)
+sst$lag.neg.22 <- lag(sst$anom, 22)
+sst$lag.neg.21 <- lag(sst$anom, 21)
+sst$lag.neg.20 <- lag(sst$anom, 20)
+sst$lag.neg.19 <- lag(sst$anom, 19)
+sst$lag.neg.18 <- lag(sst$anom, 18)
+sst$lag.neg.17 <- lag(sst$anom, 17)
+sst$lag.neg.16 <- lag(sst$anom, 16)
+sst$lag.neg.15 <- lag(sst$anom, 15)
+sst$lag.neg.14 <- lag(sst$anom, 14)
+sst$lag.neg.13 <- lag(sst$anom, 13)
 
-corrs.out <- data.frame()
+sst$lag.neg.12 <- lag(sst$anom, 12)
+sst$lag.neg.11 <- lag(sst$anom, 11)
+sst$lag.neg.10 <- lag(sst$anom, 10)
+sst$lag.neg.9 <- lag(sst$anom, 9)
+sst$lag.neg.8 <- lag(sst$anom, 8)
+sst$lag.neg.7 <- lag(sst$anom, 7)
+sst$lag.neg.6 <- lag(sst$anom, 6)
+sst$lag.neg.5 <- lag(sst$anom, 5)
+sst$lag.neg.4 <- lag(sst$anom, 4)
+sst$lag.neg.3 <- lag(sst$anom, 3)
+sst$lag.neg.2 <- lag(sst$anom, 2)
+sst$lag.neg.1 <- lag(sst$anom, 1)
 
-for(i in 1:12){
- 
-  temp <- sst.shannon %>%
-    filter(month == i)
-  
-  temp.out <- data.frame(month = i,
-                         cor = cor(temp$shannon, temp$anom))
-  
-  corrs.out <- rbind(corrs.out, temp.out)
-  
-}
+sst$lag.0 <- sst$anom
 
-order <-  c(10:12, 1:9)
-corrs.out$month <- as.factor(corrs.out$month) 
-corrs.out$month <- reorder(corrs.out$month, order)
+sst$lag.pos.1 <- lead(sst$anom, 1)
+sst$lag.pos.2 <- lead(sst$anom, 2)
+sst$lag.pos.3 <- lead(sst$anom, 3)
+sst$lag.pos.4 <- lead(sst$anom, 4)
+sst$lag.pos.5 <- lead(sst$anom, 5)
+sst$lag.pos.6 <- lead(sst$anom, 6)
+sst$lag.pos.7 <- lead(sst$anom, 7)
+sst$lag.pos.8 <- lead(sst$anom, 8)
+sst$lag.pos.9 <- lead(sst$anom, 9)
+sst$lag.pos.10 <- lead(sst$anom, 10)
+sst$lag.pos.11 <- lead(sst$anom, 11)
+sst$lag.pos.12 <- lead(sst$anom, 12)
 
-ggplot(corrs.out, aes(month, cor)) +
-  geom_bar(stat = "identity", fill = "grey", color = "dark grey")
+sst$lag.pos.13 <- lead(sst$anom, 13)
+sst$lag.pos.14 <- lead(sst$anom, 14)
+sst$lag.pos.15 <- lead(sst$anom, 15)
+sst$lag.pos.16 <- lead(sst$anom, 16)
+sst$lag.pos.17 <- lead(sst$anom, 17)
+sst$lag.pos.18 <- lead(sst$anom, 18)
+sst$lag.pos.19 <- lead(sst$anom, 19)
+sst$lag.pos.20 <- lead(sst$anom, 20)
+sst$lag.pos.21 <- lead(sst$anom, 21)
+sst$lag.pos.22 <- lead(sst$anom, 22)
+sst$lag.pos.23 <- lead(sst$anom, 23)
+sst$lag.pos.24 <- lead(sst$anom, 24)
 
-## compare Shannon with months 1:12 in year before sampling
+cor.dat <- sst[,6:67]
 
+cors <- cor(cor.dat, use = "p")
+
+dim(cors)
+
+cor.plot <- data.frame(lag = -36:24,
+                       cor = cors[1,2:62])
+
+
+ggplot(cor.plot, aes(lag, cor)) +
+  geom_bar(stat = "identity", fill = "grey", color = "dark grey") +
+  scale_x_continuous(breaks = seq(-36, 24, by = 6)) +
+  labs(x = "lag (months; 0 = March of sampling year",
+       y = "SST - Shannon correlation")
 
 
 
