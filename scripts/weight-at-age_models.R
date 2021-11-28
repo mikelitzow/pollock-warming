@@ -254,10 +254,36 @@ ggplot(age10dat, aes(as.factor(maturity_table_3), sc.weight, colour=as.factor(se
 
 #repeat models w april-jul sst==========================================================
 
+
+#reload sst data
+d1 <- read.csv("./data/western.goa.sst.csv")
+sst_lagged <- d1
+
+sst_lagged$prevyr_apr.jul.wSST <- NA
+k<-1
+for(k in 1:length(sst_lagged$year)){
+  if(k>1){
+    sst_lagged$prevyr_apr.jul.wSST[k] <- sst_lagged$apr.jul.wSST[k-1] 
+  }
+} #works now join
+
+sstjoin <- sst_lagged[,c(1,4)]
+
+age4dat <- left_join(age4dat, sstjoin, by="year")
+age5dat <- left_join(age5dat, sstjoin, by="year")
+age6dat <- left_join(age6dat, sstjoin, by="year")
+age7dat <- left_join(age7dat, sstjoin, by="year")
+age8dat <- left_join(age8dat, sstjoin, by="year")
+age9dat <- left_join(age9dat, sstjoin, by="year")
+age10dat <- left_join(age10dat, sstjoin, by="year")
+
+
+
+
 #age 4 models-------
 
 #males
-spr4male <- gamm4(sc.weight ~ s(apr.jul.wSST, k=4) + 
+spr4male <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) + 
                     maturity_table_3,
                   random=~(1|year/Haul), data=age4dat[which(age4dat$sex.code==1),])
 gam.check(spr4male$gam)
@@ -269,7 +295,7 @@ plot(spr4male$gam)
 spr4maleAICc <- AICc(spr4male$mer)
 
 #females
-spr4fem <- gamm4(sc.weight ~ s(apr.jul.wSST, k=4) + 
+spr4fem <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) + 
                    maturity_table_3,
                  random=~(1|year/Haul), data=age4dat[which(age4dat$sex.code==2),])
 gam.check(spr4fem$gam)
@@ -283,7 +309,7 @@ spr4femAICc <- AICc(spr4fem$mer)
 #age 5 models-------
 
 #males
-spr5male <- gamm4(sc.weight ~ s(apr.jul.wSST, k=4) + 
+spr5male <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) + 
                     maturity_table_3,
                   random=~(1|year/Haul), data=age5dat[which(age5dat$sex.code==1),])
 gam.check(spr5male$gam)
@@ -295,7 +321,7 @@ plot(spr5male$gam)
 spr5maleAICc <- AICc(spr5male$mer)
 
 #females
-spr5fem <- gamm4(sc.weight ~ s(apr.jul.wSST, k=4) + 
+spr5fem <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) + 
                    maturity_table_3,
                  random=~(1|year/Haul), data=age5dat[which(age5dat$sex.code==2),])
 gam.check(spr5fem$gam)
@@ -309,7 +335,7 @@ spr5femAICc <- AICc(spr5fem$mer)
 #age 6 models-------
 
 #males
-spr6male <- gamm4(sc.weight ~ s(apr.jul.wSST, k=4) + 
+spr6male <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) + 
                     maturity_table_3,
                   random=~(1|year/Haul), data=age6dat[which(age6dat$sex.code==1),])
 gam.check(spr6male$gam)
@@ -321,7 +347,7 @@ plot(spr6male$gam)
 spr6maleAICc <- AICc(spr6male$mer)
 
 #females
-spr6fem <- gamm4(sc.weight ~ s(apr.jul.wSST, k=4) + 
+spr6fem <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) + 
                    maturity_table_3,
                  random=~(1|year/Haul), data=age6dat[which(age6dat$sex.code==2),])
 gam.check(spr6fem$gam)
@@ -335,7 +361,7 @@ spr6femAICc <- AICc(spr6fem$mer)
 #age 7 models-------
 
 #males
-spr7male <- gamm4(sc.weight ~ s(apr.jul.wSST, k=4) + 
+spr7male <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) + 
                     maturity_table_3,
                   random=~(1|year/Haul), data=age7dat[which(age7dat$sex.code==1),])
 gam.check(spr7male$gam)
@@ -347,7 +373,7 @@ plot(spr7male$gam)
 spr7maleAICc <- AICc(spr7male$mer)
 
 #females
-spr7fem <- gamm4(sc.weight ~ s(apr.jul.wSST, k=4) + 
+spr7fem <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) + 
                    maturity_table_3,
                  random=~(1|year/Haul), data=age7dat[which(age7dat$sex.code==2),])
 gam.check(spr7fem$gam)
@@ -363,7 +389,7 @@ spr7femAICc <- AICc(spr7fem$mer)
 
 
 #males
-spr8male <- gamm4(sc.weight ~ s(apr.jul.wSST, k=4) + 
+spr8male <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) + 
                     maturity_table_3,
                   random=~(1|year/Haul), data=age8dat[which(age8dat$sex.code==1),])
 gam.check(spr8male$gam)
@@ -375,7 +401,7 @@ plot(spr8male$gam)
 spr8maleAICc <- AICc(spr8male$mer)
 
 #females
-spr8fem <- gamm4(sc.weight ~ s(apr.jul.wSST, k=4) + 
+spr8fem <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) + 
                    maturity_table_3,
                  random=~(1|year/Haul), data=age8dat[which(age8dat$sex.code==2),])
 gam.check(spr8fem$gam)
@@ -390,7 +416,7 @@ spr8femAICc <- AICc(spr8fem$mer)
 #age 9 models-------
 
 #males
-spr9male <- gamm4(sc.weight ~ s(apr.jul.wSST, k=4) + 
+spr9male <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) + 
                     maturity_table_3,
                   random=~(1|year/Haul), data=age9dat[which(age9dat$sex.code==1),])
 gam.check(spr9male$gam)
@@ -402,7 +428,7 @@ plot(spr9male$gam)
 spr9maleAICc <- AICc(spr9male$mer)
 
 #females
-spr9fem <- gamm4(sc.weight ~ s(apr.jul.wSST, k=4) + 
+spr9fem <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) + 
                    maturity_table_3,
                  random=~(1|year/Haul), data=age9dat[which(age9dat$sex.code==2),])
 gam.check(spr9fem$gam)
@@ -416,7 +442,7 @@ spr9femAICc <- AICc(spr9fem$mer)
 #age 10 models-------
 
 #males
-spr10male <- gamm4(sc.weight ~ s(apr.jul.wSST, k=4) + 
+spr10male <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) + 
                      maturity_table_3,
                    random=~(1|year/Haul), data=age10dat[which(age10dat$sex.code==1),])
 gam.check(spr10male$gam)
@@ -428,7 +454,7 @@ plot(spr10male$gam)
 spr10maleAICc <- AICc(spr10male$mer)
 
 #females
-spr10fem <- gamm4(sc.weight ~ s(apr.jul.wSST, k=4) + 
+spr10fem <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) + 
                     maturity_table_3,
                   random=~(1|year/Haul), data=age10dat[which(age10dat$sex.code==2),])
 gam.check(spr10fem$gam)
@@ -439,4 +465,44 @@ spr10femAICc <- AICc(spr10fem$mer)
 
 plot(spr10fem$gam)
 
+spr4maleAICc
+mod4maleAICc
 
+spr4femAICc
+mod4femAICc
+
+spr5maleAICc
+mod5maleAICc
+
+spr5femAICc
+mod5femAICc
+
+spr6maleAICc
+mod6maleAICc
+
+spr6femAICc
+mod6femAICc
+
+spr7maleAICc
+mod7maleAICc
+
+spr7femAICc
+mod7femAICc
+
+spr8maleAICc
+mod8maleAICc
+
+spr8femAICc
+mod8femAICc
+
+spr9maleAICc
+mod9maleAICc
+
+spr9femAICc
+mod9femAICc
+
+spr10maleAICc
+mod10maleAICc
+
+spr10femAICc
+mod10femAICc
