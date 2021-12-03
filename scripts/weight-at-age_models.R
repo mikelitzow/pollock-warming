@@ -511,33 +511,217 @@ mod10femAICc #better
 #spring models as linear-------------------------------------------------------------------
 #let's repeat the spring models as linear models since they all (?) look to be linear
 
-
+library(car)
 
 #age 4 lin models-------
 
 #males
-spr4male_linear <- lmer(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) + 
-                    maturity_table_3,
-                  random=~(1|year/Haul), data=age4dat[which(age4dat$sex.code==1),])
+spr4male_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                  (1|year/Haul), data=age4dat[which(age4dat$sex.code==1),])
+summary(spr4male_linear)
+Anova(spr4male_linear)
 
+#interaction not significant, drop
+spr4male_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                          (1|year/Haul), data=age4dat[which(age4dat$sex.code==1),])
+summary(spr4male_noint)
+Anova(spr4male_noint) #sst not sig
 
-
-spr4male_linear_AICc <- AICc(spr4male_linear)
 
 #females
-spr4fem_linear <- lmer(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) + 
-                   maturity_table_3,
-                 random=~(1|year/Haul), data=age4dat[which(age4dat$sex.code==2),])
+spr4fem_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                         (1|year/Haul), data=age4dat[which(age4dat$sex.code==2),])
+summary(spr4fem_linear)
+Anova(spr4fem_linear)
 
-
-spr4fem_linear_AICc <- AICc(spr4fem_linear)
-
-
-
-
-
-
-
+#interaction not significant, drop
+spr4fem_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                         (1|year/Haul), data=age4dat[which(age4dat$sex.code==2),])
+summary(spr4fem_noint)
+Anova(spr4fem_noint) #sst not sig
 
 
 
+#age 5 lin models-------
+
+#males
+spr5male_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                          (1|year/Haul), data=age5dat[which(age5dat$sex.code==1),])
+summary(spr5male_linear)
+Anova(spr5male_linear)
+
+#interaction not significant, drop
+spr5male_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                         (1|year/Haul), data=age5dat[which(age5dat$sex.code==1),])
+summary(spr5male_noint)
+Anova(spr5male_noint) 
+
+
+#females
+spr5fem_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                         (1|year/Haul), data=age5dat[which(age5dat$sex.code==2),])
+summary(spr5fem_linear)
+Anova(spr5fem_linear)
+
+#interaction not significant, drop
+spr5fem_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                        (1|year/Haul), data=age5dat[which(age5dat$sex.code==2),])
+summary(spr5fem_noint)
+Anova(spr5fem_noint)
+
+
+
+
+#age 6 lin models-------
+
+#males
+spr6male_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                          (1|year/Haul), data=age6dat[which(age6dat$sex.code==1),])
+summary(spr6male_linear)
+Anova(spr6male_linear)
+
+#interaction not significant, drop
+spr6male_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                         (1|year/Haul), data=age6dat[which(age6dat$sex.code==1),])
+summary(spr6male_noint)
+Anova(spr6male_noint) 
+
+
+#females
+spr6fem_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                         (1|year/Haul), data=age6dat[which(age6dat$sex.code==2),])
+summary(spr6fem_linear)
+Anova(spr6fem_linear)
+
+#interaction not significant, drop
+spr6fem_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                        (1|year/Haul), data=age6dat[which(age6dat$sex.code==2),])
+summary(spr6fem_noint)
+Anova(spr6fem_noint)
+
+
+
+
+#age 7 lin models-------
+
+#males
+spr7male_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                          (1|year/Haul), data=age7dat[which(age7dat$sex.code==1),])
+summary(spr7male_linear)
+Anova(spr7male_linear)
+
+#interaction not significant, drop
+spr7male_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                         (1|year/Haul), data=age7dat[which(age7dat$sex.code==1),])
+summary(spr7male_noint)
+Anova(spr7male_noint) 
+
+
+#females
+spr7fem_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                         (1|year/Haul), data=age7dat[which(age7dat$sex.code==2),])
+summary(spr7fem_linear)
+Anova(spr7fem_linear)
+
+#interaction not significant, drop
+spr7fem_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                        (1|year/Haul), data=age7dat[which(age7dat$sex.code==2),])
+summary(spr7fem_noint)
+Anova(spr7fem_noint)
+
+
+
+
+
+#age 8 lin models-------
+
+#males
+spr8male_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                          (1|year/Haul), data=age8dat[which(age8dat$sex.code==1),])
+summary(spr8male_linear)
+Anova(spr8male_linear)
+
+#interaction not significant, drop
+spr8male_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                         (1|year/Haul), data=age8dat[which(age8dat$sex.code==1),])
+summary(spr8male_noint)
+Anova(spr8male_noint) 
+
+
+#females
+spr8fem_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                         (1|year/Haul), data=age8dat[which(age8dat$sex.code==2),])
+summary(spr8fem_linear)
+Anova(spr8fem_linear)
+
+#interaction not significant, drop
+spr8fem_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                        (1|year/Haul), data=age8dat[which(age8dat$sex.code==2),])
+summary(spr8fem_noint)
+Anova(spr8fem_noint)
+
+
+
+
+
+
+#age 9 lin models-------
+
+#males
+spr9male_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                          (1|year/Haul), data=age9dat[which(age9dat$sex.code==1),])
+summary(spr9male_linear)
+Anova(spr9male_linear)
+
+#interaction not significant, drop
+spr9male_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                         (1|year/Haul), data=age9dat[which(age9dat$sex.code==1),])
+summary(spr9male_noint)
+Anova(spr9male_noint) 
+
+
+#females
+spr9fem_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                         (1|year/Haul), data=age9dat[which(age9dat$sex.code==2),])
+summary(spr9fem_linear)
+Anova(spr9fem_linear)
+
+#interaction not significant, drop
+spr9fem_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                        (1|year/Haul), data=age9dat[which(age9dat$sex.code==2),])
+summary(spr9fem_noint)
+Anova(spr9fem_noint)
+
+
+
+
+
+
+
+
+#age 10 lin models-------
+
+#males
+spr10male_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                          (1|year/Haul), data=age10dat[which(age10dat$sex.code==1),])
+summary(spr10male_linear)
+Anova(spr10male_linear)
+
+#interaction not significant, drop
+spr10male_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                         (1|year/Haul), data=age10dat[which(age10dat$sex.code==1),])
+summary(spr10male_noint)
+Anova(spr10male_noint) 
+
+
+#females
+spr10fem_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                         (1|year/Haul), data=age10dat[which(age10dat$sex.code==2),])
+summary(spr10fem_linear)
+Anova(spr10fem_linear)
+
+#interaction not significant, drop
+spr10fem_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                        (1|year/Haul), data=age10dat[which(age10dat$sex.code==2),])
+summary(spr10fem_noint)
+Anova(spr10fem_noint)
