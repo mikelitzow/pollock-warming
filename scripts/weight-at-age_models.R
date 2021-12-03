@@ -231,7 +231,7 @@ gam.check(mod10male$gam)
 summary(mod10male$gam)
 summary(mod10male$mer)
 
-plot(mod10male$gam)
+plot(mod10male$gam) #looks linear
 
 mod10maleAICc <- AICc(mod10male$mer)
 
@@ -243,7 +243,7 @@ gam.check(mod10fem$gam)
 summary(mod10fem$gam)
 summary(mod10fem$mer)
 
-plot(mod10fem$gam)
+plot(mod10fem$gam) #looks linear
 
 mod10femAICc <- AICc(mod10fem$mer)
 
@@ -287,10 +287,10 @@ spr4male <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) +
                     maturity_table_3,
                   random=~(1|year/Haul), data=age4dat[which(age4dat$sex.code==1),])
 gam.check(spr4male$gam)
-summary(spr4male$gam)
+summary(spr4male$gam) #sst not sig
 summary(spr4male$mer)
 
-plot(spr4male$gam)
+plot(spr4male$gam) #looks linear
 
 spr4maleAICc <- AICc(spr4male$mer)
 
@@ -299,10 +299,10 @@ spr4fem <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) +
                    maturity_table_3,
                  random=~(1|year/Haul), data=age4dat[which(age4dat$sex.code==2),])
 gam.check(spr4fem$gam)
-summary(spr4fem$gam)
+summary(spr4fem$gam) #sst not sig
 summary(spr4fem$mer)
 
-plot(spr4fem$gam)
+plot(spr4fem$gam) #looks linear
 
 spr4femAICc <- AICc(spr4fem$mer)
 
@@ -316,7 +316,7 @@ gam.check(spr5male$gam)
 summary(spr5male$gam)
 summary(spr5male$mer)
 
-plot(spr5male$gam)
+plot(spr5male$gam) #looks linear
 
 spr5maleAICc <- AICc(spr5male$mer)
 
@@ -328,7 +328,7 @@ gam.check(spr5fem$gam)
 summary(spr5fem$gam)
 summary(spr5fem$mer)
 
-plot(spr5fem$gam)
+plot(spr5fem$gam) #looks pretty linear too
 
 spr5femAICc <- AICc(spr5fem$mer)
 
@@ -342,7 +342,7 @@ gam.check(spr6male$gam)
 summary(spr6male$gam)
 summary(spr6male$mer)
 
-plot(spr6male$gam)
+plot(spr6male$gam) #looks linear
 
 spr6maleAICc <- AICc(spr6male$mer)
 
@@ -354,7 +354,7 @@ gam.check(spr6fem$gam)
 summary(spr6fem$gam)
 summary(spr6fem$mer)
 
-plot(spr6fem$gam)
+plot(spr6fem$gam) #looks linear
 
 spr6femAICc <- AICc(spr6fem$mer)
 
@@ -365,10 +365,10 @@ spr7male <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) +
                     maturity_table_3,
                   random=~(1|year/Haul), data=age7dat[which(age7dat$sex.code==1),])
 gam.check(spr7male$gam)
-summary(spr7male$gam)
+summary(spr7male$gam) #sst not sig
 summary(spr7male$mer)
 
-plot(spr7male$gam)
+plot(spr7male$gam) #looks linear
 
 spr7maleAICc <- AICc(spr7male$mer)
 
@@ -377,10 +377,10 @@ spr7fem <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) +
                    maturity_table_3,
                  random=~(1|year/Haul), data=age7dat[which(age7dat$sex.code==2),])
 gam.check(spr7fem$gam)
-summary(spr7fem$gam)
+summary(spr7fem$gam) #sst not sig
 summary(spr7fem$mer)
 
-plot(spr7fem$gam)
+plot(spr7fem$gam) #looks linear
 
 spr7femAICc <- AICc(spr7fem$mer)
 
@@ -393,10 +393,10 @@ spr8male <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) +
                     maturity_table_3,
                   random=~(1|year/Haul), data=age8dat[which(age8dat$sex.code==1),])
 gam.check(spr8male$gam)
-summary(spr8male$gam)
+summary(spr8male$gam) #sst not sig
 summary(spr8male$mer)
 
-plot(spr8male$gam)
+plot(spr8male$gam) #looks linear
 
 spr8maleAICc <- AICc(spr8male$mer)
 
@@ -408,7 +408,7 @@ gam.check(spr8fem$gam)
 summary(spr8fem$gam)
 summary(spr8fem$mer)
 
-plot(spr8fem$gam)
+plot(spr8fem$gam) #looks linear
 
 spr8femAICc <- AICc(spr8fem$mer)
 
@@ -423,7 +423,7 @@ gam.check(spr9male$gam)
 summary(spr9male$gam)
 summary(spr9male$mer)
 
-plot(spr9male$gam)
+plot(spr9male$gam) #looks linear
 
 spr9maleAICc <- AICc(spr9male$mer)
 
@@ -432,10 +432,10 @@ spr9fem <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) +
                    maturity_table_3,
                  random=~(1|year/Haul), data=age9dat[which(age9dat$sex.code==2),])
 gam.check(spr9fem$gam)
-summary(spr9fem$gam)
+summary(spr9fem$gam) #sst AND mat not sig
 summary(spr9fem$mer)
 
-plot(spr9fem$gam)
+plot(spr9fem$gam) #looks linear
 
 spr9femAICc <- AICc(spr9fem$mer)
 
@@ -446,10 +446,10 @@ spr10male <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) +
                      maturity_table_3,
                    random=~(1|year/Haul), data=age10dat[which(age10dat$sex.code==1),])
 gam.check(spr10male$gam)
-summary(spr10male$gam)
+summary(spr10male$gam) #sst not sig
 summary(spr10male$mer)
 
-plot(spr10male$gam)
+plot(spr10male$gam) #looks linear
 
 spr10maleAICc <- AICc(spr10male$mer)
 
@@ -458,51 +458,86 @@ spr10fem <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) +
                     maturity_table_3,
                   random=~(1|year/Haul), data=age10dat[which(age10dat$sex.code==2),])
 gam.check(spr10fem$gam)
-summary(spr10fem$gam)
+summary(spr10fem$gam) #sst not sig
 summary(spr10fem$mer)
 
 spr10femAICc <- AICc(spr10fem$mer)
 
-plot(spr10fem$gam)
+plot(spr10fem$gam) #looks linear
 
 spr4maleAICc
-mod4maleAICc
+mod4maleAICc #equiv
 
 spr4femAICc
-mod4femAICc
+mod4femAICc #equiv
 
 spr5maleAICc
-mod5maleAICc
+mod5maleAICc #equiv
 
 spr5femAICc
-mod5femAICc
+mod5femAICc #equiv
 
 spr6maleAICc
-mod6maleAICc
+mod6maleAICc #equiv
 
 spr6femAICc
-mod6femAICc
+mod6femAICc #equiv
 
 spr7maleAICc
-mod7maleAICc
+mod7maleAICc #equiv
 
 spr7femAICc
-mod7femAICc
+mod7femAICc #equiv
 
 spr8maleAICc
-mod8maleAICc
+mod8maleAICc #equiv
 
 spr8femAICc
-mod8femAICc
+mod8femAICc #equiv
 
 spr9maleAICc
-mod9maleAICc
+mod9maleAICc #equiv
 
 spr9femAICc
-mod9femAICc
+mod9femAICc #equiv
 
 spr10maleAICc
-mod10maleAICc
+mod10maleAICc #equiv
 
 spr10femAICc
-mod10femAICc
+mod10femAICc #better
+
+
+#spring models as linear-------------------------------------------------------------------
+#let's repeat the spring models as linear models since they all (?) look to be linear
+
+
+
+#age 4 lin models-------
+
+#males
+spr4male_linear <- lmer(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) + 
+                    maturity_table_3,
+                  random=~(1|year/Haul), data=age4dat[which(age4dat$sex.code==1),])
+
+
+
+spr4male_linear_AICc <- AICc(spr4male_linear)
+
+#females
+spr4fem_linear <- lmer(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) + 
+                   maturity_table_3,
+                 random=~(1|year/Haul), data=age4dat[which(age4dat$sex.code==2),])
+
+
+spr4fem_linear_AICc <- AICc(spr4fem_linear)
+
+
+
+
+
+
+
+
+
+
