@@ -614,7 +614,7 @@ Anova(spr7male_linear)
 spr7male_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
                          (1|year/Haul), data=age7dat[which(age7dat$sex.code==1),])
 summary(spr7male_noint)
-Anova(spr7male_noint) 
+Anova(spr7male_noint) #sst not sig
 
 
 #females
@@ -627,7 +627,7 @@ Anova(spr7fem_linear)
 spr7fem_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
                         (1|year/Haul), data=age7dat[which(age7dat$sex.code==2),])
 summary(spr7fem_noint)
-Anova(spr7fem_noint)
+Anova(spr7fem_noint) #sst not sig
 
 
 
@@ -645,7 +645,7 @@ Anova(spr8male_linear)
 spr8male_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
                          (1|year/Haul), data=age8dat[which(age8dat$sex.code==1),])
 summary(spr8male_noint)
-Anova(spr8male_noint) 
+Anova(spr8male_noint) #sst not sig
 
 
 #females
@@ -673,11 +673,8 @@ spr9male_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
 summary(spr9male_linear)
 Anova(spr9male_linear)
 
-#interaction not significant, drop
-spr9male_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
-                         (1|year/Haul), data=age9dat[which(age9dat$sex.code==1),])
-summary(spr9male_noint)
-Anova(spr9male_noint) 
+#interaction IS significant, won't drop
+
 
 
 #females
@@ -686,11 +683,7 @@ spr9fem_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
 summary(spr9fem_linear)
 Anova(spr9fem_linear)
 
-#interaction not significant, drop
-spr9fem_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
-                        (1|year/Haul), data=age9dat[which(age9dat$sex.code==2),])
-summary(spr9fem_noint)
-Anova(spr9fem_noint)
+#interaction IS significant, won't drop
 
 
 
@@ -703,13 +696,16 @@ Anova(spr9fem_noint)
 
 #males
 spr10male_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
-                          (1|year/Haul), data=age10dat[which(age10dat$sex.code==1),])
+                          (1|year/Haul), data=age10dat[which(age10dat$sex.code==1),]) #singular fit
+#singular fit, zero variance in yr/haul?
+table(age10dat$year[which(age10dat$sex.code==1)], age10dat$Haul[which(age10dat$sex.code==1)])
 summary(spr10male_linear)
 Anova(spr10male_linear)
 
 #interaction not significant, drop
 spr10male_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
                          (1|year/Haul), data=age10dat[which(age10dat$sex.code==1),])
+#also singular
 summary(spr10male_noint)
 Anova(spr10male_noint) 
 
@@ -724,4 +720,4 @@ Anova(spr10fem_linear)
 spr10fem_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
                         (1|year/Haul), data=age10dat[which(age10dat$sex.code==2),])
 summary(spr10fem_noint)
-Anova(spr10fem_noint)
+Anova(spr10fem_noint) #sst not sig
