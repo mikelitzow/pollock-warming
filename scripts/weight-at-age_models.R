@@ -721,3 +721,219 @@ spr10fem_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
                         (1|year/Haul), data=age10dat[which(age10dat$sex.code==2),])
 summary(spr10fem_noint)
 Anova(spr10fem_noint) #sst not sig
+
+
+
+visreg(spr10fem_noint, "prevyr_apr.jul.wSST",  data=age10dat[which(age10dat$sex.code==2),],
+       overlay=TRUE, partial=FALSE, rug=TRUE, band=TRUE)
+
+library(sjPlot)
+library(jtools)
+plot_models(spr10fem_noint, spr10male_noint)
+
+plot_model(spr10fem_noint, 
+           type="pred")
+
+effect_plot(spr10fem_noint, pred = prevyr_apr.jul.wSST, interval = TRUE, plot.points = TRUE)
+
+
+#null models----------------------------
+
+#age 4 null models----
+
+
+#males
+spr4male_null <- lmer(sc.weight ~ maturity_table_3 +
+                          (1|year/Haul), data=age4dat[which(age4dat$sex.code==1),])
+summary(spr4male_null)
+Anova(spr4male_null)
+
+male4_spr_null_AIC <- AIC(spr4male_null)
+
+#females
+spr4fem_null <- lmer(sc.weight ~  maturity_table_3 +
+                         (1|year/Haul), data=age4dat[which(age4dat$sex.code==2),])
+summary(spr4fem_null)
+Anova(spr4fem_null)
+
+fem4_spr_null_AIC <- AIC(spr4fem_null)
+
+
+
+#age 5 null models----
+
+
+#males
+spr5male_null <- lmer(sc.weight ~ maturity_table_3 +
+                        (1|year/Haul), data=age5dat[which(age5dat$sex.code==1),])
+summary(spr5male_null)
+Anova(spr5male_null)
+
+male5_spr_null_AIC <- AIC(spr5male_null)
+
+#females
+spr5fem_null <- lmer(sc.weight ~  maturity_table_3 +
+                       (1|year/Haul), data=age5dat[which(age5dat$sex.code==2),])
+summary(spr5fem_null)
+Anova(spr5fem_null)
+
+fem5_spr_null_AIC <- AIC(spr5fem_null)
+
+
+
+
+#age 6 null models----
+
+#males
+spr6male_null <- lmer(sc.weight ~ maturity_table_3 +
+                        (1|year/Haul), data=age6dat[which(age6dat$sex.code==1),])
+summary(spr6male_null)
+Anova(spr6male_null)
+
+male6_spr_null_AIC <- AIC(spr6male_null)
+
+#females
+spr6fem_null <- lmer(sc.weight ~  maturity_table_3 +
+                       (1|year/Haul), data=age6dat[which(age6dat$sex.code==2),])
+summary(spr6fem_null)
+Anova(spr6fem_null)
+
+fem6_spr_null_AIC <- AIC(spr6fem_null)
+
+
+#age 7 null models----
+
+#males
+spr7male_null <- lmer(sc.weight ~ maturity_table_3 +
+                        (1|year/Haul), data=age7dat[which(age7dat$sex.code==1),])
+summary(spr7male_null)
+Anova(spr7male_null)
+
+male7_spr_null_AIC <- AIC(spr7male_null)
+
+#females
+spr7fem_null <- lmer(sc.weight ~  maturity_table_3 +
+                       (1|year/Haul), data=age7dat[which(age7dat$sex.code==2),])
+summary(spr7fem_null)
+Anova(spr7fem_null)
+
+fem7_spr_null_AIC <- AIC(spr7fem_null)
+
+
+
+
+#age 8 null models----
+
+#males
+spr8male_null <- lmer(sc.weight ~ maturity_table_3 +
+                        (1|year/Haul), data=age8dat[which(age8dat$sex.code==1),])
+summary(spr8male_null)
+Anova(spr8male_null)
+
+male8_spr_null_AIC <- AIC(spr8male_null)
+
+#females
+spr8fem_null <- lmer(sc.weight ~  maturity_table_3 +
+                       (1|year/Haul), data=age8dat[which(age8dat$sex.code==2),])
+summary(spr8fem_null)
+Anova(spr8fem_null)
+
+fem8_spr_null_AIC <- AIC(spr8fem_null)
+
+
+
+#age 9 null models----
+
+#males
+spr9male_null <- lmer(sc.weight ~ maturity_table_3 +
+                        (1|year/Haul), data=age9dat[which(age9dat$sex.code==1),]) #didn't converge
+summary(spr9male_null)
+Anova(spr9male_null)
+
+male9_spr_null_AIC <- AIC(spr9male_null)
+
+#females
+spr9fem_null <- lmer(sc.weight ~  maturity_table_3 +
+                       (1|year/Haul), data=age9dat[which(age9dat$sex.code==2),])
+summary(spr9fem_null)
+Anova(spr9fem_null)
+
+fem9_spr_null_AIC <- AIC(spr9fem_null)
+
+
+
+#age 10 null models----
+
+#males
+spr10male_null <- lmer(sc.weight ~ maturity_table_3 +
+                        (1|year/Haul), data=age10dat[which(age10dat$sex.code==1),]) #singular fit
+summary(spr10male_null)
+Anova(spr10male_null)
+
+male10_spr_null_AIC <- AIC(spr10male_null)
+
+#females
+spr10fem_null <- lmer(sc.weight ~  maturity_table_3 +
+                       (1|year/Haul), data=age10dat[which(age10dat$sex.code==2),])
+summary(spr10fem_null)
+Anova(spr10fem_null)
+
+fem10_spr_null_AIC <- AIC(spr10fem_null)
+
+
+
+spr4maleAICc
+mod4maleAICc #equiv
+male4_spr_null_AIC
+
+spr4femAICc
+mod4femAICc #equiv
+fem4_spr_null_AIC
+
+spr5maleAICc
+mod5maleAICc #equiv
+male5_spr_null_AIC
+
+spr5femAICc
+mod5femAICc #equiv
+fem5_spr_null_AIC
+
+spr6maleAICc
+mod6maleAICc #equiv
+male6_spr_null_AIC
+
+spr6femAICc
+mod6femAICc #equiv
+fem6_spr_null_AIC
+
+spr7maleAICc
+mod7maleAICc #equiv
+male7_spr_null_AIC
+
+spr7femAICc
+mod7femAICc #equiv
+fem7_spr_null_AIC
+
+spr8maleAICc
+mod8maleAICc #equiv
+male8_spr_null_AIC
+
+spr8femAICc
+mod8femAICc #equiv
+fem8_spr_null_AIC
+
+spr9maleAICc
+mod9maleAICc #equiv
+male9_spr_null_AIC
+
+spr9femAICc
+mod9femAICc #equiv
+fem9_spr_null_AIC
+
+spr10maleAICc
+mod10maleAICc #equiv
+male10_spr_null_AIC
+
+spr10femAICc
+mod10femAICc #better
+fem10_spr_null_AIC
