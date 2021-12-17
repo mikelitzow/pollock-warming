@@ -28,7 +28,7 @@ library(oce)
 nc <- nc_open("./data/nceiErsstv5_130f_00d5_4da1.nc")
 
 # 1980-2020 GOA version:
-nc <- nc_open("./data/nceiErsstv5_7676_409f_f7a3.nc")
+# nc <- nc_open("./data/nceiErsstv5_7676_409f_f7a3.nc")
 
 # process
 
@@ -104,7 +104,7 @@ ggplot(SST.anom, aes(dec.yr, anom)) +
 write.csv(SST.anom, "./data/monthly.western.GOA.SST.anomalies.wrt.1980-2020.csv")
 
 
-## below is old!
+## get seasonal and annual means in °C
 wSST <- rowMeans(wSST, na.rm = T)
 
 # and Apr-July
@@ -144,10 +144,22 @@ ggplot(xprt, aes(year, nov.feb.wSST)) +
   geom_line() +
   geom_point()
 
+
+# finally, annual mean temp
+ann.sst <- tapply(wSST, yr, mean)
+
+
+xprt$annual.wSST <- ann.sst
+
+ggplot(xprt, aes(year, annual.wSST)) +
+  geom_line() +
+  geom_point()
+
+# and save
 write.csv(xprt, "./data/western.goa.sst.csv", row.names = F)
 
 plot <- xprt %>%
-  pivot_longer(cols = -year)
+  tidyr::pivot_longer(cols = -year)
 
 ggplot(plot, aes(year, value, color = name)) +
   geom_line() +
