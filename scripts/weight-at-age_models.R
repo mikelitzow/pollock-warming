@@ -231,7 +231,7 @@ gam.check(mod10male$gam)
 summary(mod10male$gam)
 summary(mod10male$mer)
 
-plot(mod10male$gam)
+plot(mod10male$gam) #looks linear
 
 mod10maleAICc <- AICc(mod10male$mer)
 
@@ -243,7 +243,7 @@ gam.check(mod10fem$gam)
 summary(mod10fem$gam)
 summary(mod10fem$mer)
 
-plot(mod10fem$gam)
+plot(mod10fem$gam) #looks linear
 
 mod10femAICc <- AICc(mod10fem$mer)
 
@@ -287,10 +287,10 @@ spr4male <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) +
                     maturity_table_3,
                   random=~(1|year/Haul), data=age4dat[which(age4dat$sex.code==1),])
 gam.check(spr4male$gam)
-summary(spr4male$gam)
+summary(spr4male$gam) #sst not sig
 summary(spr4male$mer)
 
-plot(spr4male$gam)
+plot(spr4male$gam) #looks linear
 
 spr4maleAICc <- AICc(spr4male$mer)
 
@@ -299,10 +299,10 @@ spr4fem <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) +
                    maturity_table_3,
                  random=~(1|year/Haul), data=age4dat[which(age4dat$sex.code==2),])
 gam.check(spr4fem$gam)
-summary(spr4fem$gam)
+summary(spr4fem$gam) #sst not sig
 summary(spr4fem$mer)
 
-plot(spr4fem$gam)
+plot(spr4fem$gam) #looks linear
 
 spr4femAICc <- AICc(spr4fem$mer)
 
@@ -316,7 +316,7 @@ gam.check(spr5male$gam)
 summary(spr5male$gam)
 summary(spr5male$mer)
 
-plot(spr5male$gam)
+plot(spr5male$gam) #looks linear
 
 spr5maleAICc <- AICc(spr5male$mer)
 
@@ -328,7 +328,7 @@ gam.check(spr5fem$gam)
 summary(spr5fem$gam)
 summary(spr5fem$mer)
 
-plot(spr5fem$gam)
+plot(spr5fem$gam) #looks pretty linear too
 
 spr5femAICc <- AICc(spr5fem$mer)
 
@@ -342,7 +342,7 @@ gam.check(spr6male$gam)
 summary(spr6male$gam)
 summary(spr6male$mer)
 
-plot(spr6male$gam)
+plot(spr6male$gam) #looks linear
 
 spr6maleAICc <- AICc(spr6male$mer)
 
@@ -354,7 +354,7 @@ gam.check(spr6fem$gam)
 summary(spr6fem$gam)
 summary(spr6fem$mer)
 
-plot(spr6fem$gam)
+plot(spr6fem$gam) #looks linear
 
 spr6femAICc <- AICc(spr6fem$mer)
 
@@ -365,10 +365,10 @@ spr7male <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) +
                     maturity_table_3,
                   random=~(1|year/Haul), data=age7dat[which(age7dat$sex.code==1),])
 gam.check(spr7male$gam)
-summary(spr7male$gam)
+summary(spr7male$gam) #sst not sig
 summary(spr7male$mer)
 
-plot(spr7male$gam)
+plot(spr7male$gam) #looks linear
 
 spr7maleAICc <- AICc(spr7male$mer)
 
@@ -377,10 +377,10 @@ spr7fem <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) +
                    maturity_table_3,
                  random=~(1|year/Haul), data=age7dat[which(age7dat$sex.code==2),])
 gam.check(spr7fem$gam)
-summary(spr7fem$gam)
+summary(spr7fem$gam) #sst not sig
 summary(spr7fem$mer)
 
-plot(spr7fem$gam)
+plot(spr7fem$gam) #looks linear
 
 spr7femAICc <- AICc(spr7fem$mer)
 
@@ -393,10 +393,10 @@ spr8male <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) +
                     maturity_table_3,
                   random=~(1|year/Haul), data=age8dat[which(age8dat$sex.code==1),])
 gam.check(spr8male$gam)
-summary(spr8male$gam)
+summary(spr8male$gam) #sst not sig
 summary(spr8male$mer)
 
-plot(spr8male$gam)
+plot(spr8male$gam) #looks linear
 
 spr8maleAICc <- AICc(spr8male$mer)
 
@@ -408,7 +408,7 @@ gam.check(spr8fem$gam)
 summary(spr8fem$gam)
 summary(spr8fem$mer)
 
-plot(spr8fem$gam)
+plot(spr8fem$gam) #looks linear
 
 spr8femAICc <- AICc(spr8fem$mer)
 
@@ -423,7 +423,7 @@ gam.check(spr9male$gam)
 summary(spr9male$gam)
 summary(spr9male$mer)
 
-plot(spr9male$gam)
+plot(spr9male$gam) #looks linear
 
 spr9maleAICc <- AICc(spr9male$mer)
 
@@ -432,10 +432,10 @@ spr9fem <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) +
                    maturity_table_3,
                  random=~(1|year/Haul), data=age9dat[which(age9dat$sex.code==2),])
 gam.check(spr9fem$gam)
-summary(spr9fem$gam)
+summary(spr9fem$gam) #sst AND mat not sig
 summary(spr9fem$mer)
 
-plot(spr9fem$gam)
+plot(spr9fem$gam) #looks linear
 
 spr9femAICc <- AICc(spr9fem$mer)
 
@@ -446,10 +446,10 @@ spr10male <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) +
                      maturity_table_3,
                    random=~(1|year/Haul), data=age10dat[which(age10dat$sex.code==1),])
 gam.check(spr10male$gam)
-summary(spr10male$gam)
+summary(spr10male$gam) #sst not sig
 summary(spr10male$mer)
 
-plot(spr10male$gam)
+plot(spr10male$gam) #looks linear
 
 spr10maleAICc <- AICc(spr10male$mer)
 
@@ -458,51 +458,482 @@ spr10fem <- gamm4(sc.weight ~ s(prevyr_apr.jul.wSST, k=4) +
                     maturity_table_3,
                   random=~(1|year/Haul), data=age10dat[which(age10dat$sex.code==2),])
 gam.check(spr10fem$gam)
-summary(spr10fem$gam)
+summary(spr10fem$gam) #sst not sig
 summary(spr10fem$mer)
 
 spr10femAICc <- AICc(spr10fem$mer)
 
-plot(spr10fem$gam)
+plot(spr10fem$gam) #looks linear
 
 spr4maleAICc
-mod4maleAICc
+mod4maleAICc #equiv
 
 spr4femAICc
-mod4femAICc
+mod4femAICc #equiv
 
 spr5maleAICc
-mod5maleAICc
+mod5maleAICc #equiv
 
 spr5femAICc
-mod5femAICc
+mod5femAICc #equiv
 
 spr6maleAICc
-mod6maleAICc
+mod6maleAICc #equiv
 
 spr6femAICc
-mod6femAICc
+mod6femAICc #equiv
 
 spr7maleAICc
-mod7maleAICc
+mod7maleAICc #equiv
 
 spr7femAICc
-mod7femAICc
+mod7femAICc #equiv
 
 spr8maleAICc
-mod8maleAICc
+mod8maleAICc #equiv
 
 spr8femAICc
-mod8femAICc
+mod8femAICc #equiv
 
 spr9maleAICc
-mod9maleAICc
+mod9maleAICc #equiv
 
 spr9femAICc
-mod9femAICc
+mod9femAICc #equiv
 
 spr10maleAICc
-mod10maleAICc
+mod10maleAICc #equiv
 
 spr10femAICc
-mod10femAICc
+mod10femAICc #better
+
+
+#spring models as linear-------------------------------------------------------------------
+#let's repeat the spring models as linear models since they all (?) look to be linear
+
+library(car)
+
+#age 4 lin models-------
+
+#males
+spr4male_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                  (1|year/Haul), data=age4dat[which(age4dat$sex.code==1),])
+summary(spr4male_linear)
+Anova(spr4male_linear)
+
+#interaction not significant, drop
+spr4male_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                          (1|year/Haul), data=age4dat[which(age4dat$sex.code==1),])
+summary(spr4male_noint)
+Anova(spr4male_noint) #sst not sig
+
+
+#females
+spr4fem_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                         (1|year/Haul), data=age4dat[which(age4dat$sex.code==2),])
+summary(spr4fem_linear)
+Anova(spr4fem_linear)
+
+#interaction not significant, drop
+spr4fem_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                         (1|year/Haul), data=age4dat[which(age4dat$sex.code==2),])
+summary(spr4fem_noint)
+Anova(spr4fem_noint) #sst not sig
+
+
+
+#age 5 lin models-------
+
+#males
+spr5male_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                          (1|year/Haul), data=age5dat[which(age5dat$sex.code==1),])
+summary(spr5male_linear)
+Anova(spr5male_linear)
+
+#interaction not significant, drop
+spr5male_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                         (1|year/Haul), data=age5dat[which(age5dat$sex.code==1),])
+summary(spr5male_noint)
+Anova(spr5male_noint) 
+
+
+#females
+spr5fem_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                         (1|year/Haul), data=age5dat[which(age5dat$sex.code==2),])
+summary(spr5fem_linear)
+Anova(spr5fem_linear)
+
+#interaction not significant, drop
+spr5fem_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                        (1|year/Haul), data=age5dat[which(age5dat$sex.code==2),])
+summary(spr5fem_noint)
+Anova(spr5fem_noint)
+
+
+
+
+#age 6 lin models-------
+
+#males
+spr6male_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                          (1|year/Haul), data=age6dat[which(age6dat$sex.code==1),])
+summary(spr6male_linear)
+Anova(spr6male_linear)
+
+#interaction not significant, drop
+spr6male_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                         (1|year/Haul), data=age6dat[which(age6dat$sex.code==1),])
+summary(spr6male_noint)
+Anova(spr6male_noint) 
+
+
+#females
+spr6fem_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                         (1|year/Haul), data=age6dat[which(age6dat$sex.code==2),])
+summary(spr6fem_linear)
+Anova(spr6fem_linear)
+
+#interaction not significant, drop
+spr6fem_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                        (1|year/Haul), data=age6dat[which(age6dat$sex.code==2),])
+summary(spr6fem_noint)
+Anova(spr6fem_noint)
+
+
+
+
+#age 7 lin models-------
+
+#males
+spr7male_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                          (1|year/Haul), data=age7dat[which(age7dat$sex.code==1),])
+summary(spr7male_linear)
+Anova(spr7male_linear)
+
+#interaction not significant, drop
+spr7male_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                         (1|year/Haul), data=age7dat[which(age7dat$sex.code==1),])
+summary(spr7male_noint)
+Anova(spr7male_noint) #sst not sig
+
+
+#females
+spr7fem_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                         (1|year/Haul), data=age7dat[which(age7dat$sex.code==2),])
+summary(spr7fem_linear)
+Anova(spr7fem_linear)
+
+#interaction not significant, drop
+spr7fem_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                        (1|year/Haul), data=age7dat[which(age7dat$sex.code==2),])
+summary(spr7fem_noint)
+Anova(spr7fem_noint) #sst not sig
+
+
+
+
+
+#age 8 lin models-------
+
+#males
+spr8male_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                          (1|year/Haul), data=age8dat[which(age8dat$sex.code==1),])
+summary(spr8male_linear)
+Anova(spr8male_linear)
+
+#interaction not significant, drop
+spr8male_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                         (1|year/Haul), data=age8dat[which(age8dat$sex.code==1),])
+summary(spr8male_noint)
+Anova(spr8male_noint) #sst not sig
+
+
+#females
+spr8fem_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                         (1|year/Haul), data=age8dat[which(age8dat$sex.code==2),])
+summary(spr8fem_linear)
+Anova(spr8fem_linear)
+
+#interaction not significant, drop
+spr8fem_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                        (1|year/Haul), data=age8dat[which(age8dat$sex.code==2),])
+summary(spr8fem_noint)
+Anova(spr8fem_noint)
+
+
+
+
+
+
+#age 9 lin models-------
+
+#males
+spr9male_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                          (1|year/Haul), data=age9dat[which(age9dat$sex.code==1),])
+summary(spr9male_linear)
+Anova(spr9male_linear)
+
+#interaction IS significant, won't drop
+
+
+
+#females
+spr9fem_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                         (1|year/Haul), data=age9dat[which(age9dat$sex.code==2),])
+summary(spr9fem_linear)
+Anova(spr9fem_linear)
+
+#interaction IS significant, won't drop
+
+
+
+
+
+
+
+
+#age 10 lin models-------
+
+#males
+spr10male_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                          (1|year/Haul), data=age10dat[which(age10dat$sex.code==1),]) #singular fit
+#singular fit, zero variance in yr/haul?
+table(age10dat$year[which(age10dat$sex.code==1)], age10dat$Haul[which(age10dat$sex.code==1)])
+summary(spr10male_linear)
+Anova(spr10male_linear)
+
+#interaction not significant, drop
+spr10male_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                         (1|year/Haul), data=age10dat[which(age10dat$sex.code==1),])
+#also singular
+summary(spr10male_noint)
+Anova(spr10male_noint) 
+
+
+#females
+spr10fem_linear <- lmer(sc.weight ~ prevyr_apr.jul.wSST* maturity_table_3 +
+                         (1|year/Haul), data=age10dat[which(age10dat$sex.code==2),])
+summary(spr10fem_linear)
+Anova(spr10fem_linear)
+
+#interaction not significant, drop
+spr10fem_noint <- lmer(sc.weight ~ prevyr_apr.jul.wSST + maturity_table_3 +
+                        (1|year/Haul), data=age10dat[which(age10dat$sex.code==2),])
+summary(spr10fem_noint)
+Anova(spr10fem_noint) #sst not sig
+
+
+
+visreg(spr10fem_noint, "prevyr_apr.jul.wSST",  data=age10dat[which(age10dat$sex.code==2),],
+       overlay=TRUE, partial=FALSE, rug=TRUE, band=TRUE)
+
+library(sjPlot)
+library(jtools)
+plot_models(spr10fem_noint, spr10male_noint)
+
+plot_model(spr10fem_noint, 
+           type="pred")
+
+effect_plot(spr10fem_noint, pred = prevyr_apr.jul.wSST, interval = TRUE, plot.points = TRUE)
+
+
+#null models----------------------------
+
+#age 4 null models----
+
+
+#males
+spr4male_null <- lmer(sc.weight ~ maturity_table_3 +
+                          (1|year/Haul), data=age4dat[which(age4dat$sex.code==1),])
+summary(spr4male_null)
+Anova(spr4male_null)
+
+male4_spr_null_AIC <- AIC(spr4male_null)
+
+#females
+spr4fem_null <- lmer(sc.weight ~  maturity_table_3 +
+                         (1|year/Haul), data=age4dat[which(age4dat$sex.code==2),])
+summary(spr4fem_null)
+Anova(spr4fem_null)
+
+fem4_spr_null_AIC <- AIC(spr4fem_null)
+
+
+
+#age 5 null models----
+
+
+#males
+spr5male_null <- lmer(sc.weight ~ maturity_table_3 +
+                        (1|year/Haul), data=age5dat[which(age5dat$sex.code==1),])
+summary(spr5male_null)
+Anova(spr5male_null)
+
+male5_spr_null_AIC <- AIC(spr5male_null)
+
+#females
+spr5fem_null <- lmer(sc.weight ~  maturity_table_3 +
+                       (1|year/Haul), data=age5dat[which(age5dat$sex.code==2),])
+summary(spr5fem_null)
+Anova(spr5fem_null)
+
+fem5_spr_null_AIC <- AIC(spr5fem_null)
+
+
+
+
+#age 6 null models----
+
+#males
+spr6male_null <- lmer(sc.weight ~ maturity_table_3 +
+                        (1|year/Haul), data=age6dat[which(age6dat$sex.code==1),])
+summary(spr6male_null)
+Anova(spr6male_null)
+
+male6_spr_null_AIC <- AIC(spr6male_null)
+
+#females
+spr6fem_null <- lmer(sc.weight ~  maturity_table_3 +
+                       (1|year/Haul), data=age6dat[which(age6dat$sex.code==2),])
+summary(spr6fem_null)
+Anova(spr6fem_null)
+
+fem6_spr_null_AIC <- AIC(spr6fem_null)
+
+
+#age 7 null models----
+
+#males
+spr7male_null <- lmer(sc.weight ~ maturity_table_3 +
+                        (1|year/Haul), data=age7dat[which(age7dat$sex.code==1),])
+summary(spr7male_null)
+Anova(spr7male_null)
+
+male7_spr_null_AIC <- AIC(spr7male_null)
+
+#females
+spr7fem_null <- lmer(sc.weight ~  maturity_table_3 +
+                       (1|year/Haul), data=age7dat[which(age7dat$sex.code==2),])
+summary(spr7fem_null)
+Anova(spr7fem_null)
+
+fem7_spr_null_AIC <- AIC(spr7fem_null)
+
+
+
+
+#age 8 null models----
+
+#males
+spr8male_null <- lmer(sc.weight ~ maturity_table_3 +
+                        (1|year/Haul), data=age8dat[which(age8dat$sex.code==1),])
+summary(spr8male_null)
+Anova(spr8male_null)
+
+male8_spr_null_AIC <- AIC(spr8male_null)
+
+#females
+spr8fem_null <- lmer(sc.weight ~  maturity_table_3 +
+                       (1|year/Haul), data=age8dat[which(age8dat$sex.code==2),])
+summary(spr8fem_null)
+Anova(spr8fem_null)
+
+fem8_spr_null_AIC <- AIC(spr8fem_null)
+
+
+
+#age 9 null models----
+
+#males
+spr9male_null <- lmer(sc.weight ~ maturity_table_3 +
+                        (1|year/Haul), data=age9dat[which(age9dat$sex.code==1),]) #didn't converge
+summary(spr9male_null)
+Anova(spr9male_null)
+
+male9_spr_null_AIC <- AIC(spr9male_null)
+
+#females
+spr9fem_null <- lmer(sc.weight ~  maturity_table_3 +
+                       (1|year/Haul), data=age9dat[which(age9dat$sex.code==2),])
+summary(spr9fem_null)
+Anova(spr9fem_null)
+
+fem9_spr_null_AIC <- AIC(spr9fem_null)
+
+
+
+#age 10 null models----
+
+#males
+spr10male_null <- lmer(sc.weight ~ maturity_table_3 +
+                        (1|year/Haul), data=age10dat[which(age10dat$sex.code==1),]) #singular fit
+summary(spr10male_null)
+Anova(spr10male_null)
+
+male10_spr_null_AIC <- AIC(spr10male_null)
+
+#females
+spr10fem_null <- lmer(sc.weight ~  maturity_table_3 +
+                       (1|year/Haul), data=age10dat[which(age10dat$sex.code==2),])
+summary(spr10fem_null)
+Anova(spr10fem_null)
+
+fem10_spr_null_AIC <- AIC(spr10fem_null)
+
+
+
+spr4maleAICc
+mod4maleAICc #equiv
+male4_spr_null_AIC
+
+spr4femAICc
+mod4femAICc #equiv
+fem4_spr_null_AIC
+
+spr5maleAICc
+mod5maleAICc #equiv
+male5_spr_null_AIC
+
+spr5femAICc
+mod5femAICc #equiv
+fem5_spr_null_AIC
+
+spr6maleAICc
+mod6maleAICc #equiv
+male6_spr_null_AIC
+
+spr6femAICc
+mod6femAICc #equiv
+fem6_spr_null_AIC
+
+spr7maleAICc
+mod7maleAICc #equiv
+male7_spr_null_AIC
+
+spr7femAICc
+mod7femAICc #equiv
+fem7_spr_null_AIC
+
+spr8maleAICc
+mod8maleAICc #equiv
+male8_spr_null_AIC
+
+spr8femAICc
+mod8femAICc #equiv
+fem8_spr_null_AIC
+
+spr9maleAICc
+mod9maleAICc #equiv
+male9_spr_null_AIC
+
+spr9femAICc
+mod9femAICc #equiv
+fem9_spr_null_AIC
+
+spr10maleAICc
+mod10maleAICc #equiv
+male10_spr_null_AIC
+
+spr10femAICc
+mod10femAICc #better
+fem10_spr_null_AIC
