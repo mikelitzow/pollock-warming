@@ -1283,3 +1283,503 @@ fem10_spr_null_AIC
 linwin10femAICc #better than spring and null but not winter
 
 
+
+
+
+
+
+#repeat models w annual sst==========================================================
+
+
+#reload sst data
+d1 <- read.csv("./data/western.goa.sst.csv")
+sst_lagged <- d1
+
+sst_lagged$prevyr_annual.wSST <- NA
+k<-1
+for(k in 1:length(sst_lagged$year)){
+  if(k>1){
+    sst_lagged$prevyr_annual.wSST[k] <- sst_lagged$annual.wSST[k-1] 
+  }
+} #works now join
+
+sstjoin <- sst_lagged[,c(1,5)]
+
+age4dat <- left_join(age4dat, sstjoin, by="year")
+age5dat <- left_join(age5dat, sstjoin, by="year")
+age6dat <- left_join(age6dat, sstjoin, by="year")
+age7dat <- left_join(age7dat, sstjoin, by="year")
+age8dat <- left_join(age8dat, sstjoin, by="year")
+age9dat <- left_join(age9dat, sstjoin, by="year")
+age10dat <- left_join(age10dat, sstjoin, by="year")
+
+
+
+#age 4 lin models-------
+
+ggplot(age4dat[which(age4dat$sex.code==1),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")+ facet_wrap(~maturity_table_3)
+
+#males
+ann4male_linear <- lmer(sc.weight ~ prevyr_annual.wSST* maturity_table_3 +
+                          (1|year/Haul), data=age4dat[which(age4dat$sex.code==1),])
+summary(ann4male_linear)
+Anova(ann4male_linear, type="III")
+
+#interaction significant
+# ann4male_noint <- lmer(sc.weight ~ prevyr_annual.wSST + maturity_table_3 +
+#                          (1|year/Haul), data=age4dat[which(age4dat$sex.code==1),])
+# summary(ann4male_noint)
+# Anova(ann4male_noint) #
+
+
+#females
+ggplot(age4dat[which(age4dat$sex.code==2),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")+ facet_wrap(~maturity_table_3)
+
+ann4fem_linear <- lmer(sc.weight ~ prevyr_annual.wSST* maturity_table_3 +
+                         (1|year/Haul), data=age4dat[which(age4dat$sex.code==2),])
+summary(ann4fem_linear)
+Anova(ann4fem_linear, type="III")
+
+#interaction not significant, drop
+ann4fem_noint <- lmer(sc.weight ~ prevyr_annual.wSST + maturity_table_3 +
+                        (1|year/Haul), data=age4dat[which(age4dat$sex.code==2),])
+summary(ann4fem_noint)
+Anova(ann4fem_noint) #sst not sig
+
+
+
+
+
+#age 5 lin models-------
+
+ggplot(age5dat[which(age5dat$sex.code==1),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")+ facet_wrap(~maturity_table_3)
+
+#males
+ann5male_linear <- lmer(sc.weight ~ prevyr_annual.wSST* maturity_table_3 +
+                          (1|year/Haul), data=age5dat[which(age5dat$sex.code==1),])
+summary(ann5male_linear)
+Anova(ann5male_linear, type="III")
+
+#interaction not significant drop
+ann5male_noint <- lmer(sc.weight ~ prevyr_annual.wSST + maturity_table_3 +
+                         (1|year/Haul), data=age5dat[which(age5dat$sex.code==1),])
+summary(ann5male_noint)
+Anova(ann5male_noint) #both sig
+
+
+#females
+ggplot(age5dat[which(age5dat$sex.code==2),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")+ facet_wrap(~maturity_table_3)
+
+ann5fem_linear <- lmer(sc.weight ~ prevyr_annual.wSST* maturity_table_3 +
+                         (1|year/Haul), data=age5dat[which(age5dat$sex.code==2),])
+summary(ann5fem_linear)
+Anova(ann5fem_linear, type="III")
+
+#interaction  significant
+# ann5fem_noint <- lmer(sc.weight ~ prevyr_annual.wSST + maturity_table_3 +
+#                         (1|year/Haul), data=age5dat[which(age5dat$sex.code==2),])
+# summary(ann5fem_noint)
+# Anova(ann5fem_noint) #sst not sig
+
+
+
+
+#age 6 lin models-------
+
+ggplot(age6dat[which(age6dat$sex.code==1),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")+ facet_wrap(~maturity_table_3)
+
+#males
+ann6male_linear <- lmer(sc.weight ~ prevyr_annual.wSST* maturity_table_3 +
+                          (1|year/Haul), data=age6dat[which(age6dat$sex.code==1),])
+summary(ann6male_linear)
+Anova(ann6male_linear, type="III")
+
+#interaction not significant drop
+ann6male_noint <- lmer(sc.weight ~ prevyr_annual.wSST + maturity_table_3 +
+                         (1|year/Haul), data=age6dat[which(age6dat$sex.code==1),])
+summary(ann6male_noint)
+Anova(ann6male_noint) #both sig
+
+
+#females
+ggplot(age6dat[which(age6dat$sex.code==2),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")+ facet_wrap(~maturity_table_3)
+
+ann6fem_linear <- lmer(sc.weight ~ prevyr_annual.wSST* maturity_table_3 +
+                         (1|year/Haul), data=age6dat[which(age6dat$sex.code==2),])
+summary(ann6fem_linear)
+Anova(ann6fem_linear, type="III")
+
+#interaction not significant drop
+ann6fem_noint <- lmer(sc.weight ~ prevyr_annual.wSST + maturity_table_3 +
+                        (1|year/Haul), data=age6dat[which(age6dat$sex.code==2),])
+summary(ann6fem_noint)
+Anova(ann6fem_noint) #both sig
+
+
+
+
+
+
+#age 7 lin models-------
+
+ggplot(age7dat[which(age7dat$sex.code==1),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")+ facet_wrap(~maturity_table_3)
+
+#males
+ann7male_linear <- lmer(sc.weight ~ prevyr_annual.wSST* maturity_table_3 +
+                          (1|year/Haul), data=age7dat[which(age7dat$sex.code==1),])
+summary(ann7male_linear)
+Anova(ann7male_linear, type="III")
+
+#interaction not significant drop
+ann7male_noint <- lmer(sc.weight ~ prevyr_annual.wSST + maturity_table_3 +
+                         (1|year/Haul), data=age7dat[which(age7dat$sex.code==1),])
+summary(ann7male_noint)
+Anova(ann7male_noint) #both sig
+
+
+#females
+ggplot(age7dat[which(age7dat$sex.code==2),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")+ facet_wrap(~maturity_table_3)
+
+ann7fem_linear <- lmer(sc.weight ~ prevyr_annual.wSST* maturity_table_3 +
+                         (1|year/Haul), data=age7dat[which(age7dat$sex.code==2),])
+summary(ann7fem_linear)
+Anova(ann7fem_linear, type="III")
+
+#interaction not significant drop
+ann7fem_noint <- lmer(sc.weight ~ prevyr_annual.wSST + maturity_table_3 +
+                        (1|year/Haul), data=age7dat[which(age7dat$sex.code==2),])
+summary(ann7fem_noint)
+Anova(ann7fem_noint) #both sig
+
+
+
+
+
+
+#age 8 lin models-------
+
+ggplot(age8dat[which(age8dat$sex.code==1),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")+ facet_wrap(~maturity_table_3)
+
+#males
+ann8male_linear <- lmer(sc.weight ~ prevyr_annual.wSST* maturity_table_3 +
+                          (1|year/Haul), data=age8dat[which(age8dat$sex.code==1),])
+summary(ann8male_linear)
+Anova(ann8male_linear, type="III")
+
+#interaction not significant drop
+ann8male_noint <- lmer(sc.weight ~ prevyr_annual.wSST + maturity_table_3 +
+                         (1|year/Haul), data=age8dat[which(age8dat$sex.code==1),])
+summary(ann8male_noint)
+Anova(ann8male_noint) #both sig
+
+
+#females
+ggplot(age8dat[which(age8dat$sex.code==2),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")+ facet_wrap(~maturity_table_3)
+
+ann8fem_linear <- lmer(sc.weight ~ prevyr_annual.wSST* maturity_table_3 +
+                         (1|year/Haul), data=age8dat[which(age8dat$sex.code==2),])
+summary(ann8fem_linear)
+Anova(ann8fem_linear, type="III")
+
+#interaction not significant drop
+ann8fem_noint <- lmer(sc.weight ~ prevyr_annual.wSST + maturity_table_3 +
+                        (1|year/Haul), data=age8dat[which(age8dat$sex.code==2),])
+summary(ann8fem_noint)
+Anova(ann8fem_noint) #both sig
+
+
+
+
+
+
+
+#age 9 lin models-------
+
+ggplot(age9dat[which(age9dat$sex.code==1),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")+ facet_wrap(~maturity_table_3)
+
+#males
+ann9male_linear <- lmer(sc.weight ~ prevyr_annual.wSST* maturity_table_3 +
+                          (1|year/Haul), data=age9dat[which(age9dat$sex.code==1),])
+summary(ann9male_linear)
+Anova(ann9male_linear, type="III")
+
+#interaction significant
+# ann9male_noint <- lmer(sc.weight ~ prevyr_annual.wSST + maturity_table_3 +
+#                          (1|year/Haul), data=age9dat[which(age9dat$sex.code==1),])
+# summary(ann9male_noint)
+# Anova(ann9male_noint) #
+
+
+#females
+ggplot(age9dat[which(age9dat$sex.code==2),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")+ facet_wrap(~maturity_table_3)
+
+ann9fem_linear <- lmer(sc.weight ~ prevyr_annual.wSST* maturity_table_3 +
+                         (1|year/Haul), data=age9dat[which(age9dat$sex.code==2),])
+summary(ann9fem_linear)
+Anova(ann9fem_linear, type="III")
+
+#interaction not significant drop
+ann9fem_noint <- lmer(sc.weight ~ prevyr_annual.wSST + maturity_table_3 +
+                        (1|year/Haul), data=age9dat[which(age9dat$sex.code==2),])
+summary(ann9fem_noint)
+Anova(ann9fem_noint) #both sig
+
+
+
+
+
+
+
+#age 10 lin models-------
+
+ggplot(age10dat[which(age10dat$sex.code==1),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")+ facet_wrap(~maturity_table_3)
+
+#males
+ann10male_linear <- lmer(sc.weight ~ prevyr_annual.wSST* maturity_table_3 +
+                          (1|year/Haul), data=age10dat[which(age10dat$sex.code==1),]) #singular
+summary(ann10male_linear)
+Anova(ann10male_linear, type="III")
+
+
+ann10male_noint <- lmer(sc.weight ~ prevyr_annual.wSST + maturity_table_3 +
+                         (1|year/Haul), data=age10dat[which(age10dat$sex.code==1),]) #singular no var in haul:year
+summary(ann10male_noint)
+Anova(ann10male_noint) #
+
+
+#females
+ggplot(age10dat[which(age10dat$sex.code==2),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")+ facet_wrap(~maturity_table_3)
+
+ann10fem_linear <- lmer(sc.weight ~ prevyr_annual.wSST* maturity_table_3 +
+                         (1|year/Haul), data=age10dat[which(age10dat$sex.code==2),])
+summary(ann10fem_linear)
+Anova(ann10fem_linear, type="III")
+
+#interaction not significant drop
+ann10fem_noint <- lmer(sc.weight ~ prevyr_annual.wSST + maturity_table_3 +
+                        (1|year/Haul), data=age10dat[which(age10dat$sex.code==2),])
+summary(ann10fem_noint)
+Anova(ann10fem_noint) #both sig
+
+
+#null models annual--------
+
+
+#age 4 lin models-------
+
+#males
+ann4male_null <- lmer(sc.weight ~ maturity_table_3 +
+                          (1|year/Haul), data=age4dat[which(age4dat$sex.code==1),])
+summary(ann4male_null)
+Anova(ann4male_null, type="II")
+
+AIC(ann4male_null)
+AIC(ann4male_linear) #same
+
+r.squaredGLMM(ann4male_null)
+r.squaredGLMM(ann4male_linear) #0.02 gain
+
+#females
+ann4fem_null <- lmer(sc.weight ~ maturity_table_3 +
+                         (1|year/Haul), data=age4dat[which(age4dat$sex.code==2),])
+summary(ann4fem_null)
+Anova(ann4fem_null, type="II")
+
+AIC(ann4fem_null) #better
+AIC(ann4fem_linear)
+
+r.squaredGLMM(ann4fem_null)
+r.squaredGLMM(ann4fem_linear) #0.01 gain
+
+
+#age 5 lin models-------
+
+#males
+ann5male_null <- lmer(sc.weight ~ maturity_table_3 +
+                          (1|year/Haul), data=age5dat[which(age5dat$sex.code==1),])
+summary(ann5male_null)
+Anova(ann5male_null, type="II")
+
+AIC(ann5male_null) #better
+AIC(ann5male_linear)
+
+r.squaredGLMM(ann5male_null) 
+r.squaredGLMM(ann5male_linear)#0.12 gain
+
+#females
+ann5fem_null <- lmer(sc.weight ~ maturity_table_3 +
+                         (1|year/Haul), data=age5dat[which(age5dat$sex.code==2),])
+summary(ann5fem_null)
+Anova(ann5fem_null, type="II")
+
+AIC(ann5fem_null)
+AIC(ann5fem_linear) #same
+
+r.squaredGLMM(ann5fem_null)
+r.squaredGLMM(ann5fem_linear) #0.09 gain
+
+
+
+#age 6 lin models-------
+
+#males
+ann6male_null <- lmer(sc.weight ~  maturity_table_3 +
+                          (1|year/Haul), data=age6dat[which(age6dat$sex.code==1),])
+summary(ann6male_null)
+Anova(ann6male_null, type="II")
+
+AIC(ann6male_null) #aic 4 lower
+AIC(ann6male_linear)
+
+r.squaredGLMM(ann6male_null)
+r.squaredGLMM(ann6male_linear) #0.07 gain
+
+#females
+ann6fem_null <- lmer(sc.weight ~  maturity_table_3 +
+                         (1|year/Haul), data=age6dat[which(age6dat$sex.code==2),])
+summary(ann6fem_null)
+Anova(ann6fem_null, type="II")
+
+AIC(ann6fem_null) #aic 4 lower
+AIC(ann6fem_linear)
+
+r.squaredGLMM(ann6fem_null)
+r.squaredGLMM(ann6fem_linear) #0.08 gain
+
+
+
+
+
+#age 7 lin models-------
+
+#males
+ann7male_null <- lmer(sc.weight ~  maturity_table_3 +
+                          (1|year/Haul), data=age7dat[which(age7dat$sex.code==1),])
+summary(ann7male_null)
+Anova(ann7male_null, type="II")
+
+AIC(ann7male_null) #aic 5 lower
+AIC(ann7male_linear)
+
+r.squaredGLMM(ann7male_null)
+r.squaredGLMM(ann7male_linear) #0.08 gain
+
+#females
+ann7fem_null <- lmer(sc.weight ~  maturity_table_3 +
+                         (1|year/Haul), data=age7dat[which(age7dat$sex.code==2),])
+summary(ann7fem_null)
+Anova(ann7fem_null, type="II")
+
+AIC(ann7fem_null) #aic 5 lower
+AIC(ann7fem_linear)
+
+r.squaredGLMM(ann7fem_null)
+r.squaredGLMM(ann7fem_linear) #0.08 gain
+
+
+
+
+#age 8 lin models-------
+
+#males
+ann8male_null <- lmer(sc.weight ~ maturity_table_3 +
+                          (1|year/Haul), data=age8dat[which(age8dat$sex.code==1),])
+summary(ann8male_null)
+Anova(ann8male_null, type="II")
+
+AIC(ann8male_null) #better
+AIC(ann8male_linear)
+
+r.squaredGLMM(ann8male_null)
+r.squaredGLMM(ann8male_linear) #0.09 gain
+
+#females
+ann8fem_null <- lmer(sc.weight ~  maturity_table_3 +
+                         (1|year/Haul), data=age8dat[which(age8dat$sex.code==2),])
+summary(ann8fem_null)
+Anova(ann8fem_null, type="II")
+
+AIC(ann8fem_null)
+AIC(ann8fem_linear) #same
+
+r.squaredGLMM(ann8fem_null)
+r.squaredGLMM(ann8fem_linear) #0.10 gain
+
+
+#age 9 lin models-------
+
+#males
+ann9male_null <- lmer(sc.weight ~  maturity_table_3 +
+                          (1|year/Haul), data=age9dat[which(age9dat$sex.code==1),]) #failed to converge
+summary(ann9male_null)
+Anova(ann9male_null, type="II")
+
+AIC(ann9male_null)
+AIC(ann9male_linear) #aic 5 lower
+
+r.squaredGLMM(ann9male_null)
+r.squaredGLMM(ann9male_linear) #0.12 gain
+
+#females
+ann9fem_null <- lmer(sc.weight ~  maturity_table_3 +
+                         (1|year/Haul), data=age9dat[which(age9dat$sex.code==2),])
+summary(ann9fem_null)
+Anova(ann9fem_null, type="II")
+
+AIC(ann9fem_null)
+AIC(ann9fem_linear) #same
+
+r.squaredGLMM(ann9fem_null)
+r.squaredGLMM(ann9fem_linear) #0.09 gain
+
+
+#age 10 lin models-------
+
+#males
+ann10male_null <- lmer(sc.weight ~  maturity_table_3 +
+                           (1|year/Haul), data=age10dat[which(age10dat$sex.code==1),]) #singular
+summary(ann10male_null)
+Anova(ann10male_null, type="II") #singular
+
+AIC(ann10male_null)
+AIC(ann10male_linear)
+
+r.squaredGLMM(ann10male_null)
+r.squaredGLMM(ann10male_linear) #0.13 gain
+
+#females
+ann10fem_null <- lmer(sc.weight ~  maturity_table_3 +
+                          (1|year/Haul), data=age10dat[which(age10dat$sex.code==2),])
+summary(ann10fem_null)
+Anova(ann10fem_null, type="II")
+
+AIC(ann10fem_null)
+AIC(ann10fem_linear) #same
+
+r.squaredGLMM(ann10fem_null)
+r.squaredGLMM(ann10fem_linear) #0.09 gain
+
+
+table(age4dat$sex.code, age4dat$maturity_table_3)
+table(age5dat$sex.code, age5dat$maturity_table_3)
+table(age6dat$sex.code, age6dat$maturity_table_3)
+table(age7dat$sex.code, age7dat$maturity_table_3)
+table(age8dat$sex.code, age8dat$maturity_table_3)
+table(age9dat$sex.code, age9dat$maturity_table_3)
+table(age10dat$sex.code, age10dat$maturity_table_3)
+
+
