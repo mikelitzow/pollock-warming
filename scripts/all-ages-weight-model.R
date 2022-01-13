@@ -25,6 +25,7 @@ ggplot(all.dat, aes(annual.wSST, sc.weight, colour=as.factor(Age))) + geom_point
 
 all.dat$sex.code <- as.factor(all.dat$sex.code)
 all.dat$age.factor <- as.factor(all.dat$Age)
+all.dat$maturity_table_3 <- as.factor(all.dat$maturity_table_3)
 
 #big overall model----
 
@@ -80,16 +81,47 @@ dat_lag <- left_join(all.dat, sstjoin)
 
 bigmod5 <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by=age.factor, k=4) + maturity_table_3,
                  random=~(1|year/Haul), data=dat_lag[which(dat_lag$sex.code==1),])
-gam.check(bigmod3$gam)
-plot(bigmod3$gam)
-summary(bigmod3$gam)
-anova(bigmod3$gam)
+gam.check(bigmod5$gam)
+plot(bigmod5$gam)
+summary(bigmod5$gam)
+anova(bigmod5$gam)
 
 bigmod6 <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by=age.factor, k=4) + maturity_table_3,
                  random=~(1|year/Haul), data=dat_lag[which(dat_lag$sex.code==2),])
-gam.check(bigmod4$gam)
-plot(bigmod4$gam)
-summary(bigmod4$gam)
-anova(bigmod4$gam)
+gam.check(bigmod6$gam)
+plot(bigmod6$gam)
+summary(bigmod6$gam)
+anova(bigmod6$gam)
 
+
+#what about maturity?-------
+
+bigmod7 <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by=maturity_table_3, k=4),
+                 random=~(1|year/Haul), data=dat_lag[which(dat_lag$sex.code==2),])
+gam.check(bigmod7$gam)
+plot(bigmod7$gam)
+summary(bigmod7$gam)
+anova(bigmod7$gam)
+
+
+bigmod8 <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by=maturity_table_3, k=4) + maturity_table_3*age.factor,
+                 random=~(1|year/Haul), data=dat_lag[which(dat_lag$sex.code==2),])
+gam.check(bigmod8$gam)
+plot(bigmod8$gam)
+summary(bigmod8$gam)
+anova(bigmod8$gam)
+
+
+bigmod9 <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by=maturity_table_3, k=4) + maturity_table_3*age.factor,
+                 random=~(1|year/Haul), data=dat_lag[which(dat_lag$sex.code==1),])
+gam.check(bigmod9$gam)
+plot(bigmod9$gam)
+summary(bigmod9$gam)
+anova(bigmod9$gam)
+
+ggplot(dat_lag[which(dat_lag$sex.code==1),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + geom_smooth(method="lm") +
+  facet_wrap(~Age, scales="free")
+
+ggplot(dat_lag[which(dat_lag$sex.code==2),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + geom_smooth(method="lm") +
+  facet_wrap(~Age, scales="free")
 
