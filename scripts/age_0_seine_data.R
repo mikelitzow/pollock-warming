@@ -13,6 +13,8 @@ head(dat)
 # add sst
 sst <- read.csv("./data/western.goa.jan-jul.sst.csv")
 
+# this is average western GOA for January-June (roughly, spawning until settlement)
+
 dat <- left_join(dat, sst)
 
 str(dat)
