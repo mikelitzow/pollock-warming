@@ -1783,3 +1783,376 @@ table(age9dat$sex.code, age9dat$maturity_table_3)
 table(age10dat$sex.code, age10dat$maturity_table_3)
 
 
+
+
+#only maturity code 3------------------
+
+age4mat3 <- age4dat[which(age4dat$maturity_table_3=="3"),]
+age5mat3 <- age5dat[which(age5dat$maturity_table_3=="3"),]
+age6mat3 <- age6dat[which(age6dat$maturity_table_3=="3"),]
+age7mat3 <- age7dat[which(age7dat$maturity_table_3=="3"),]
+age8mat3 <- age8dat[which(age8dat$maturity_table_3=="3"),]
+age9mat3 <- age9dat[which(age9dat$maturity_table_3=="3"),]
+age10mat3 <- age10dat[which(age10dat$maturity_table_3=="3"),]
+
+
+
+#age 4 lin models-------
+
+ggplot(age4mat3[which(age4mat3$sex.code==1),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")
+
+#males
+threes4male_linear <- lmer(sc.weight ~ prevyr_annual.wSST +
+                          (1|year/Haul), data=age4mat3[which(age4mat3$sex.code==1),])
+summary(threes4male_linear)
+Anova(threes4male_linear, type="II")
+
+
+#females
+ggplot(age4mat3[which(age4mat3$sex.code==2),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")
+
+threes4fem_linear <- lmer(sc.weight ~ prevyr_annual.wSST +
+                         (1|year/Haul), data=age4mat3[which(age4mat3$sex.code==2),])
+summary(threes4fem_linear)
+Anova(threes4fem_linear, type="II") #not sig
+
+
+
+
+
+#age 5 lin models-------
+
+ggplot(age5mat3[which(age5mat3$sex.code==1),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")
+
+#males
+threes5male_linear <- lmer(sc.weight ~ prevyr_annual.wSST +
+                             (1|year/Haul), data=age5mat3[which(age5mat3$sex.code==1),])
+summary(threes5male_linear)
+Anova(threes5male_linear, type="II")
+
+
+#females
+ggplot(age5mat3[which(age5mat3$sex.code==2),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")
+
+threes5fem_linear <- lmer(sc.weight ~ prevyr_annual.wSST +
+                            (1|year/Haul), data=age5mat3[which(age5mat3$sex.code==2),])
+summary(threes5fem_linear)
+Anova(threes5fem_linear, type="II")
+
+
+
+
+
+#age 6 lin models-------
+
+ggplot(age6mat3[which(age6mat3$sex.code==1),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")
+
+#males
+threes6male_linear <- lmer(sc.weight ~ prevyr_annual.wSST +
+                             (1|year/Haul), data=age6mat3[which(age6mat3$sex.code==1),])
+summary(threes6male_linear)
+Anova(threes6male_linear, type="II")
+
+
+#females
+ggplot(age6mat3[which(age6mat3$sex.code==2),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")
+
+threes6fem_linear <- lmer(sc.weight ~ prevyr_annual.wSST +
+                            (1|year/Haul), data=age6mat3[which(age6mat3$sex.code==2),])
+summary(threes6fem_linear)
+Anova(threes6fem_linear, type="II")
+
+
+
+
+
+#age 7 lin models-------
+
+ggplot(age7mat3[which(age7mat3$sex.code==1),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")
+
+#males
+threes7male_linear <- lmer(sc.weight ~ prevyr_annual.wSST +
+                             (1|year/Haul), data=age7mat3[which(age7mat3$sex.code==1),])
+summary(threes7male_linear)
+Anova(threes7male_linear, type="II")
+
+
+#females
+ggplot(age7mat3[which(age7mat3$sex.code==2),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")
+
+threes7fem_linear <- lmer(sc.weight ~ prevyr_annual.wSST +
+                            (1|year/Haul), data=age7mat3[which(age7mat3$sex.code==2),])
+summary(threes7fem_linear)
+Anova(threes7fem_linear, type="II")
+
+
+
+
+
+#age 8 lin models-------
+
+ggplot(age8mat3[which(age8mat3$sex.code==1),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")
+
+#males
+threes8male_linear <- lmer(sc.weight ~ prevyr_annual.wSST +
+                             (1|year/Haul), data=age8mat3[which(age8mat3$sex.code==1),])
+summary(threes8male_linear)
+Anova(threes8male_linear, type="II") #not sig
+
+
+#females
+ggplot(age8mat3[which(age8mat3$sex.code==2),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")
+
+threes8fem_linear <- lmer(sc.weight ~ prevyr_annual.wSST +
+                            (1|year/Haul), data=age8mat3[which(age8mat3$sex.code==2),])
+summary(threes8fem_linear)
+Anova(threes8fem_linear, type="II")
+
+
+
+
+#age 9 lin models-------
+
+ggplot(age9mat3[which(age9mat3$sex.code==1),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")
+
+#males
+threes9male_linear <- lmer(sc.weight ~ prevyr_annual.wSST +
+                             (1|year/Haul), data=age9mat3[which(age9mat3$sex.code==1),])
+summary(threes9male_linear)
+Anova(threes9male_linear, type="II") #not sig
+
+
+#females
+ggplot(age9mat3[which(age9mat3$sex.code==2),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")
+
+threes9fem_linear <- lmer(sc.weight ~ prevyr_annual.wSST +
+                            (1|year/Haul), data=age9mat3[which(age9mat3$sex.code==2),])
+summary(threes9fem_linear)
+Anova(threes9fem_linear, type="II")
+
+
+
+
+#age 10 lin models-------
+
+ggplot(age10mat3[which(age10mat3$sex.code==1),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")
+
+#males
+threes10male_linear <- lmer(sc.weight ~ prevyr_annual.wSST +
+                             (1|year/Haul), data=age10mat3[which(age10mat3$sex.code==1),]) #singular
+summary(threes10male_linear)
+Anova(threes10male_linear, type="II") #not sig
+
+
+#females
+ggplot(age10mat3[which(age10mat3$sex.code==2),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + 
+  geom_smooth(method="lm")
+
+threes10fem_linear <- lmer(sc.weight ~ prevyr_annual.wSST +
+                            (1|year/Haul), data=age10mat3[which(age10mat3$sex.code==2),])
+summary(threes10fem_linear)
+Anova(threes10fem_linear, type="II")
+
+
+#null models only 3 maturity code------
+
+
+
+#age 4 null models-------
+
+#males
+threes4male_null <- lmer(sc.weight ~ 
+                             (1|year/Haul), data=age4mat3[which(age4mat3$sex.code==1),])
+summary(threes4male_null)
+Anova(threes4male_null, type="II")
+
+
+#females
+
+threes4fem_null <- lmer(sc.weight ~ 
+                            (1|year/Haul), data=age4mat3[which(age4mat3$sex.code==2),])
+summary(threes4fem_null)
+Anova(threes4fem_null, type="II") #
+
+
+
+
+
+#age 5 null models-------
+
+
+#males
+threes5male_null <- lmer(sc.weight ~ 
+                             (1|year/Haul), data=age5mat3[which(age5mat3$sex.code==1),])
+summary(threes5male_null)
+Anova(threes5male_null, type="II")
+
+
+#females
+
+threes5fem_null <- lmer(sc.weight ~ 
+                            (1|year/Haul), data=age5mat3[which(age5mat3$sex.code==2),])
+summary(threes5fem_null)
+Anova(threes5fem_null, type="II")
+
+
+
+
+
+#age 6 null models-------
+
+#males
+threes6male_null <- lmer(sc.weight ~ 
+                             (1|year/Haul), data=age6mat3[which(age6mat3$sex.code==1),])
+summary(threes6male_null)
+Anova(threes6male_null, type="II")
+
+
+#females
+
+threes6fem_null <- lmer(sc.weight ~ 
+                            (1|year/Haul), data=age6mat3[which(age6mat3$sex.code==2),])
+summary(threes6fem_null)
+Anova(threes6fem_null, type="II")
+
+
+
+
+
+#age 7 null models-------
+
+#males
+threes7male_null <- lmer(sc.weight ~ 
+                             (1|year/Haul), data=age7mat3[which(age7mat3$sex.code==1),])
+summary(threes7male_null)
+Anova(threes7male_null, type="II")
+
+
+#females
+
+threes7fem_null <- lmer(sc.weight ~ 
+                            (1|year/Haul), data=age7mat3[which(age7mat3$sex.code==2),])
+summary(threes7fem_null)
+Anova(threes7fem_null, type="II")
+
+
+
+
+
+#age 8 null models-------
+
+#males
+threes8male_null <- lmer(sc.weight ~ 
+                             (1|year/Haul), data=age8mat3[which(age8mat3$sex.code==1),])
+summary(threes8male_null)
+Anova(threes8male_null, type="II") #not sig
+
+
+#females
+
+threes8fem_null <- lmer(sc.weight ~ 
+                            (1|year/Haul), data=age8mat3[which(age8mat3$sex.code==2),])
+summary(threes8fem_null)
+Anova(threes8fem_null, type="II")
+
+
+
+
+#age 9 null models-------
+
+#males
+threes9male_null <- lmer(sc.weight ~ 
+                             (1|year/Haul), data=age9mat3[which(age9mat3$sex.code==1),])
+summary(threes9male_null)
+Anova(threes9male_null, type="II") #not sig
+
+
+#females
+threes9fem_null <- lmer(sc.weight ~ 
+                            (1|year/Haul), data=age9mat3[which(age9mat3$sex.code==2),])
+summary(threes9fem_null)
+Anova(threes9fem_null, type="II")
+
+
+
+
+#age 10 null models-------
+
+#males
+threes10male_null <- lmer(sc.weight ~ 
+                              (1|year/Haul), data=age10mat3[which(age10mat3$sex.code==1),]) #singular
+summary(threes10male_null)
+Anova(threes10male_null, type="II") #
+
+
+#females
+
+threes10fem_null <- lmer(sc.weight ~ 
+                             (1|year/Haul), data=age10mat3[which(age10mat3$sex.code==2),])
+summary(threes10fem_null)
+Anova(threes10fem_null, type="II")
+
+
+AIC(threes4male_linear) #lower by 6
+AIC(threes4male_null)
+
+AIC(threes4fem_linear) #higher by 2
+AIC(threes4fem_null)
+
+
+AIC(threes5male_linear) #lower by 5
+AIC(threes5male_null)
+
+AIC(threes5fem_linear) #lower by 7
+AIC(threes5fem_null)
+
+
+AIC(threes6male_linear) #lower by 6
+AIC(threes6male_null)
+
+AIC(threes6fem_linear) #lower by 7
+AIC(threes6fem_null)
+
+
+AIC(threes7male_linear) #lower by 2
+AIC(threes7male_null)
+
+AIC(threes7fem_linear) #lower by 3
+AIC(threes7fem_null)
+
+
+AIC(threes8male_linear) #same
+AIC(threes8male_null)
+
+AIC(threes8fem_linear) #lower by 5
+AIC(threes8fem_null)
+
+
+AIC(threes9male_linear) #high by 3
+AIC(threes9male_null)
+
+AIC(threes9fem_linear) #lower by 3
+AIC(threes9fem_null)
+
+
+AIC(threes10male_linear) #higher by 2
+AIC(threes10male_null)
+
+AIC(threes10fem_linear) #lower by 5
+AIC(threes10fem_null)
+
+library(performance)
+check_model(threes5fem_linear)
