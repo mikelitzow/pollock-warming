@@ -29,35 +29,53 @@ all.dat$maturity_table_3 <- as.factor(all.dat$maturity_table_3)
 
 #big overall model----
 
-bigmod1 <- gamm4(sc.weight ~ s(annual.wSST, k=4) + s(annual.wSST, by=age.factor, k=4) + #s(annual.wSST, by=sex.code, k=4) +
-                    maturity_table_3,
-                  random=~(1|year/Haul), data=all.dat)
-gam.check(bigmod1$gam)
-plot(bigmod1$gam)
-summary(bigmod1$gam)
+#BELOW doesn't make a lot of sense because of timing of survey, skip to the lagged models farther down
 
-bigmod2 <- gamm4(sc.weight ~  s(annual.wSST, by=age.factor, k=4), #+ #s(annual.wSST, by=sex.code, k=4),
-                 random=~(1|year/Haul), data=all.dat)
-gam.check(bigmod2$gam)
-plot(bigmod2$gam)
-summary(bigmod2$gam)
-anova(bigmod2$gam)
-
-bigmod3 <- gamm4(sc.weight ~  s(annual.wSST, by=age.factor, k=4) + maturity_table_3,
-                 random=~(1|year/Haul), data=all.dat[which(all.dat$sex.code==1),])
-gam.check(bigmod3$gam)
-plot(bigmod3$gam)
-summary(bigmod3$gam)
-anova(bigmod3$gam)
-
-bigmod4 <- gamm4(sc.weight ~  s(annual.wSST, by=age.factor, k=4) + maturity_table_3,
-                 random=~(1|year/Haul), data=all.dat[which(all.dat$sex.code==2),])
-gam.check(bigmod4$gam)
-plot(bigmod4$gam)
-summary(bigmod4$gam)
-anova(bigmod4$gam)
-
-
+# bigmod1 <- gamm4(sc.weight ~ s(annual.wSST, k=4) + s(annual.wSST, by=age.factor, k=4) + #s(annual.wSST, by=sex.code, k=4) +
+#                     maturity_table_3,
+#                   random=~(1|year/Haul), data=all.dat)
+# gam.check(bigmod1$gam)
+# plot(bigmod1$gam)
+# summary(bigmod1$gam)
+# 
+# bigmod2 <- gamm4(sc.weight ~  s(annual.wSST, by=age.factor, k=4), #+ #s(annual.wSST, by=sex.code, k=4),
+#                  random=~(1|year/Haul), data=all.dat)
+# gam.check(bigmod2$gam)
+# plot(bigmod2$gam)
+# summary(bigmod2$gam)
+# anova(bigmod2$gam)
+# 
+# bigmod3 <- gamm4(sc.weight ~  s(annual.wSST, by=age.factor, k=4) + maturity_table_3,
+#                  random=~(1|year/Haul), data=all.dat[which(all.dat$sex.code==1),])
+# gam.check(bigmod3$gam)
+# plot(bigmod3$gam)
+# summary(bigmod3$gam)
+# anova(bigmod3$gam)
+# 
+# bigmod4 <- gamm4(sc.weight ~  s(annual.wSST, by=age.factor, k=4) + maturity_table_3,
+#                  random=~(1|year/Haul), data=all.dat[which(all.dat$sex.code==2),])
+# gam.check(bigmod4$gam)
+# plot(bigmod4$gam)
+# summary(bigmod4$gam)
+# 
+# anova(bigmod4$gam)
+# 
+# bigmodS1 <- gamm4(sc.weight ~ s(annual.wSST, k=4) + age.factor +
+#                    maturity_table_3,
+#                  random=~(1|year/Haul), data=all.dat[which(all.dat$sex.code==1),])
+# gam.check(bigmodS1$gam)
+# plot(bigmodS1$gam)
+# summary(bigmodS1$gam)
+# 
+# bigmodS2 <- gamm4(sc.weight ~ s(annual.wSST, k=4) + age.factor +
+#                     maturity_table_3,
+#                   random=~(1|year/Haul), data=all.dat[which(all.dat$sex.code==2),])
+# gam.check(bigmodS2$gam)
+# plot(bigmodS2$gam)
+# summary(bigmodS2$gam)
+# 
+# AIC(bigmodS1$mer, bigmod3$mer)
+# AIC(bigmodS2$mer, bigmod4$mer)
 
 
 #lag annual sst------
@@ -124,4 +142,40 @@ ggplot(dat_lag[which(dat_lag$sex.code==1),], aes(prevyr_annual.wSST, sc.weight, 
 
 ggplot(dat_lag[which(dat_lag$sex.code==2),], aes(prevyr_annual.wSST, sc.weight, col=maturity_table_3)) + geom_point() + geom_smooth(method="lm") +
   facet_wrap(~Age, scales="free")
+
+#add cohort effects=================================================================
+
+dat_lag$cohort <- dat_lag$year - dat_lag$Age
+dat_lag$cohort <- as.factor(dat_lag$cohort)
+
+coM <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by=age.factor, k=4) + maturity_table_3,
+                 random=~(1|year/Haul) + (1|cohort), data=dat_lag[which(dat_lag$sex.code==1),])
+gam.check(coM$gam)
+plot(coM$gam)
+summary(coM$gam)
+anova(coM$gam)
+
+coF <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by=age.factor, k=4) + maturity_table_3,
+                 random=~(1|year/Haul) + (1|cohort), data=dat_lag[which(dat_lag$sex.code==2),])
+gam.check(coM$gam)
+plot(coM$gam)
+summary(coM$gam)
+anova(coM$gam)
+
+
+#without age interaction
+
+coMnoa <- gamm4(sc.weight ~  s(prevyr_annual.wSST,  k=4) + maturity_table_3,
+             random=~(1|year/Haul) + (1|cohort), data=dat_lag[which(dat_lag$sex.code==1),])
+gam.check(coMnoa$gam)
+plot(coMnoa$gam)
+summary(coMnoa$gam)
+anova(coMnoa$gam)
+
+coFnoa <- gamm4(sc.weight ~  s(prevyr_annual.wSST, k=4) + maturity_table_3,
+             random=~(1|year/Haul) + (1|cohort), data=dat_lag[which(dat_lag$sex.code==2),])
+gam.check(coMnoa$gam)
+plot(coMnoa$gam)
+summary(coMnoa$gam)
+anova(coMnoa$gam)
 
