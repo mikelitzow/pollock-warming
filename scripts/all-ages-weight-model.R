@@ -174,8 +174,10 @@ anova(coMnoa$gam)
 
 coFnoa <- gamm4(sc.weight ~  s(prevyr_annual.wSST, k=4) + maturity_table_3,
              random=~(1|year/Haul) + (1|cohort), data=dat_lag[which(dat_lag$sex.code==2),])
-gam.check(coMnoa$gam)
-plot(coMnoa$gam)
-summary(coMnoa$gam)
-anova(coMnoa$gam)
+gam.check(coFnoa$gam)
+plot(coFnoa$gam)
+summary(coFnoa$gam)
+anova(coFnoa$gam)
 
+AIC(coMnoa$mer, coM$mer)
+AIC(coFnoa$mer, coF$mer)
