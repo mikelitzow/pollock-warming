@@ -157,10 +157,10 @@ anova(coM$gam)
 
 coF <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by=age.factor, k=4) + maturity_table_3,
                  random=~(1|year/Haul) + (1|cohort), data=dat_lag[which(dat_lag$sex.code==2),])
-gam.check(coM$gam)
-plot(coM$gam)
-summary(coM$gam)
-anova(coM$gam)
+gam.check(coF$gam)
+plot(coF$gam)
+summary(coF$gam)
+anova(coF$gam)
 
 
 #without age interaction
