@@ -181,3 +181,18 @@ anova(coFnoa$gam)
 
 AIC(coMnoa$mer, coM$mer)
 AIC(coFnoa$mer, coF$mer)
+
+# models without age effect are best
+
+# models suggest very different shapes to temperature effects for each sex
+
+# try a combined model - separate smooths to each sex
+coBnoa <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by = sex.code, k=4) +maturity_table_3:sex.code,
+                random=~(1|year/Haul) + (1|cohort), data=dat_lag) # model does not fit
+
+# try with random effect maturity:sex.code
+coBnoa <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by = sex.code, k=4),
+                random=~(1|year/Haul) + (1|cohort) + (1|sex.code/maturity_table_3), data=dat_lag) # no dice
+
+# save the cohort version of the data
+write.csv(dat_lag, "./data/cohort_weight_age.csv", row.names = F)
