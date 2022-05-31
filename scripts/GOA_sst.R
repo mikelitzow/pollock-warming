@@ -25,7 +25,9 @@ library(oce)
 # load and process SST data
 # nc <- nc_open("~temp")
 
-nc <- nc_open("./data/nceiErsstv5_130f_00d5_4da1.nc")
+# nc <- nc_open("./data/nceiErsstv5_130f_00d5_4da1.nc")
+
+nc <- nc_open("./data/nceiErsstv5_6fc3_2e06_d3bf.nc")
 
 # 1980-2020 GOA version:
 # nc <- nc_open("./data/nceiErsstv5_7676_409f_f7a3.nc")
@@ -101,7 +103,7 @@ SST.anom$dec.yr = SST.anom$year + (SST.anom$month-0.5)/12
 ggplot(SST.anom, aes(dec.yr, anom)) +
   geom_line()
 
-write.csv(SST.anom, "./data/monthly.western.GOA.SST.anomalies.wrt.1980-2020.csv")
+write.csv(SST.anom, "./data/monthly_western_GOA_SST_anomalies_wrt_1980-2021.csv", row.names = F)
 
 
 ## get seasonal and annual means in °C
