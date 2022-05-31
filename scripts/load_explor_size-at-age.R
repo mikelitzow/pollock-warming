@@ -375,7 +375,7 @@ ggplot(plot.mature, aes(as.numeric(as.character(year)), value)) +
   facet_wrap(~name, scales = "free_y", ncol = 1)
 
 # load sst as a covariate
-sst <- read.csv("./data/monthly.western.GOA.SST.anomalies.wrt.1980-2020.csv")
+sst <- read.csv("./data/monthly_western_GOA_SST_anomalies_wrt_1980-2021.csv")
 
 # now cross-correlate sst-diversity
 
