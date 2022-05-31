@@ -15,6 +15,12 @@ library(visreg)
 library(gratia)
 library(gamm4)
 library(MuMIn)
+
+library(rstan)
+library(brms)
+library(bayesplot)
+source("./scripts/stan_utils.R")
+
 theme_set(theme_bw())
 
 #look at weight by age and sst
@@ -196,3 +202,65 @@ coBnoa <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by = sex.code, k=4),
 
 # save the cohort version of the data
 write.csv(dat_lag, "./data/cohort_weight_age.csv", row.names = F)
+
+## brms models ---------------
+
+weight1_formula <-  bf(sc.weight ~  s(prevyr_annual.wSST, k=4) + maturity_table_3 +
+                         (1|year/Haul) + (1|cohort))
+
+
+## Show default priors
+get_prior(weight1_formula, dat_lag)
+
+
+## fit models --------------------------------------
+weight_sst_female <- brm(weight1_formula,
+                         data = dplyr::filter(dat_lag, sex.code==2),
+                         cores = 4, chains = 4, iter = 4000,
+                         save_pars = save_pars(all = TRUE),
+                         control = list(adapt_delta = 0.999, max_treedepth = 16))
+
+saveRDS(weight_sst_female, file = "./output/brm_weight_sst_female.rds")
+
+weight_sst_male <- brm(weight1_formula,
+                       data = dplyr::filter(dat_lag, sex.code==1),
+                       cores = 4, chains = 4, iter = 14000,
+                       save_pars = save_pars(all = TRUE),
+                       control = list(adapt_delta = 0.9999, max_treedepth = 16))
+
+saveRDS(weight_sst_male, file = "./output/brm_weight_sst_male.rds")
+
+#######################-------------
+# plot both
+## 95% CI
+ce1s_1 <- conditional_effects(weight_sst_female, effect = "prevyr_annual.wSST", re_formula = NA,
+                              probs = c(0.025, 0.975))
+
+dat_ce <- ce1s_1$prevyr_annual.wSST
+dat_ce[["upper_95"]] <- dat_ce[["upper__"]]
+dat_ce[["lower_95"]] <- dat_ce[["lower__"]]
+
+dat_ce$sex <- "female"
+
+# now male
+ce1s_1 <- conditional_effects(weight_sst_male, effect = "prevyr_annual.wSST", re_formula = NA,
+                              probs = c(0.025, 0.975))
+
+dat_ce2 <- ce1s_1$prevyr_annual.wSST
+dat_ce2[["upper_95"]] <- dat_ce[["upper__"]]
+dat_ce2[["lower_95"]] <- dat_ce[["lower__"]]
+
+dat_ce2$sex <- "male"
+
+plot_both <- rbind(dat_ce, dat_ce2)
+
+
+
+ggplot(plot_both) +
+  aes(x = effect1__, y = estimate__, fill = sex, color = sex) +
+  geom_ribbon(aes(ymin = lower__, ymax = upper__), alpha = 0.2, lty = 0) +
+  geom_line(size = 1) +
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_color_manual(values = cb[c(2,6)]) +
+  scale_fill_manual(values = cb[c(2,6)]) +
+  labs(x = "Previous year SST", y = "Weight anomaly") 
