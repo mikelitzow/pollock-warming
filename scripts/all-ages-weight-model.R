@@ -204,6 +204,8 @@ coBnoa <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by = sex.code, k=4),
 write.csv(dat_lag, "./data/cohort_weight_age.csv", row.names = F)
 
 ## brms models ---------------
+# reload for brms 
+dat_lag <- read.csv("./data/cohort_weight_age.csv")
 
 weight1_formula <-  bf(sc.weight ~  s(prevyr_annual.wSST, k=4) + maturity_table_3 +
                          (1|year/Haul) + (1|cohort))
@@ -222,14 +224,21 @@ weight_sst_female <- brm(weight1_formula,
 
 saveRDS(weight_sst_female, file = "./output/brm_weight_sst_female.rds")
 
+weight_sst_female <- readRDS("./output/brm_weight_sst_female.rds")
+
 weight_sst_male <- brm(weight1_formula,
                        data = dplyr::filter(dat_lag, sex.code==1),
-                       cores = 4, chains = 4, iter = 14000,
+                       seed = 99,
+                       cores = 4, chains = 4, iter = 12000,
                        save_pars = save_pars(all = TRUE),
-                       control = list(adapt_delta = 0.9999, max_treedepth = 16))
+                       control = list(adapt_delta = 0.9999999, max_treedepth = 16))
 
 saveRDS(weight_sst_male, file = "./output/brm_weight_sst_male.rds")
 
+weight_sst_male <- readRDS("./output/brm_weight_sst_male.rds")
+
+neff_lowest(weight_sst_male$fit)
+check_hmc_diagnostics(weight_sst_male$fit)
 #######################-------------
 # plot both
 ## 95% CI
