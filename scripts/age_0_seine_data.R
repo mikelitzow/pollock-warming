@@ -2,6 +2,7 @@
 
 library(tidyverse)
 theme_set(theme_bw())
+library(mgcv)
 
 dat <- read.csv("./data/cod.pollock.lengths.2006.2021.csv", row.names = 1)
 
@@ -58,8 +59,8 @@ ggplot(dat, aes(julian, length)) +
   geom_point()
 # they grow!
 
-ggplot(dat, aes(as.factor(year), as.numeric(sst))) +
-  geom_bar(stat = "identity")
+ggplot(dat, aes(year, sst)) +
+  geom_col()
 
 ggplot(dat, aes(sst, length)) +
   geom_point()
@@ -75,6 +76,7 @@ mod1 <- mgcv::gam(length ~ s(julian, k = 3) + s(sst, k = 3) + bay_fac, data = da
 
 summary(mod1)
 plot(mod1)
+
 # suggests strong monotonic sst effects
 # also suggests some strong bay differences
 # but these are all over the map geographically 
@@ -107,6 +109,8 @@ plot(mod3$gam)
 # this is producing nested random terms
 mod4 <- gamm(length ~ s(julian, k = 3) + s(sst, k = 3), 
              random = list(year_fac=~1, bay_fac=~1, day_site=~1), data = dat)
+
+gam.check(mod4$gam)
 
 summary(mod4$lme)
 summary(mod4$gam)
@@ -157,7 +161,6 @@ summary(mod7$mer)
 summary(mod7$gam)
 
 plot(mod7$gam)
-
 
 ######
 # ok, here is my summary:
