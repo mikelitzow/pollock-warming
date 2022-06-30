@@ -22,6 +22,7 @@ library(bayesplot)
 source("./scripts/stan_utils.R")
 
 theme_set(theme_bw())
+cb <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
 #look at weight by age and sst
 
@@ -272,4 +273,6 @@ ggplot(plot_both) +
   geom_hline(yintercept = 0, lty = 2) +
   scale_color_manual(values = cb[c(2,6)]) +
   scale_fill_manual(values = cb[c(2,6)]) +
-  labs(x = "Previous year SST", y = "Weight anomaly") 
+  labs(x = "Previous year SST (°C)", y = "Log weight anomaly") 
+
+ggsave("./figs/weight_age_sst_by_sex.png", width = 6, height = 4, units = 'in')
