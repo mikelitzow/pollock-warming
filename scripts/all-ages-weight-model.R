@@ -193,8 +193,41 @@ AIC(coFnoa$mer, coF$mer)
 
 # models suggest very different shapes to temperature effects for each sex
 
+# plot predictions from each model on the same panel
+new_dat <- data.frame(prevyr_annual.wSST = seq(min(dat_lag$prevyr_annual.wSST), max(dat_lag$prevyr_annual.wSST), length.out = 100),
+                         maturity_table_3 = 4) # predicting for spawning weight
+
+pred_female <- predict(coFnoa$gam, newdata = new_dat, se.fit = T)
+plot_female <- data.frame(SST = new_dat$prevyr_annual.wSST,
+                          estimate = pred_female$fit, 
+                          LCI = pred_female$fit - 1.96*pred_female$se.fit,
+                          UCI = pred_female$fit + 1.96*pred_female$se.fit,
+                          sex = "Female")
+
+pred_male <- predict(coMnoa$gam, newdata = new_dat, se.fit = T)
+plot_male <- data.frame(SST = new_dat$prevyr_annual.wSST,
+                        estimate = pred_male$fit, 
+                          LCI = pred_male$fit - 1.96*pred_male$se.fit,
+                          UCI = pred_male$fit + 1.96*pred_male$se.fit,
+                          sex = "Male")
+
+
+plot_both <- rbind(plot_female, plot_male)
+
+
+ggplot(plot_both) +
+  aes(x = SST, y = estimate, fill = sex, color = sex) +
+  geom_ribbon(aes(ymin = LCI, ymax = UCI), alpha = 0.2, lty = 0) +
+  geom_line(size = 1) +
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_color_manual(values = cb[c(2,6)]) +
+  scale_fill_manual(values = cb[c(2,6)]) +
+  labs(x = "Previous year SST (°C)", y = "Log weight anomaly") 
+
+ggsave("./figs/weight_age_sst_by_sex_gamm.png", width = 6, height = 4, units = 'in')
+
 # try a combined model - separate smooths to each sex
-coBnoa <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by = sex.code, k=4) +maturity_table_3:sex.code,
+coBnoa <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by = sex.code, k=4) + maturity_table_3:sex.code,
                 random=~(1|year/Haul) + (1|cohort), data=dat_lag) # model does not fit
 
 # try with random effect maturity:sex.code
@@ -275,4 +308,4 @@ ggplot(plot_both) +
   scale_fill_manual(values = cb[c(2,6)]) +
   labs(x = "Previous year SST (°C)", y = "Log weight anomaly") 
 
-ggsave("./figs/weight_age_sst_by_sex.png", width = 6, height = 4, units = 'in')
+ggsave("./figs/weight_age_sst_by_sex_brms.png", width = 6, height = 4, units = 'in')
