@@ -1,9 +1,11 @@
 # load and process age-0 pollock data from beach seines
 
 library(tidyverse)
-theme_set(theme_bw())
 library(mgcv)
 library(gamm4)
+
+theme_set(theme_bw())
+cb <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
 dat <- read.csv("./data/cod.pollock.lengths.2006.2021.csv", row.names = 1)
 
