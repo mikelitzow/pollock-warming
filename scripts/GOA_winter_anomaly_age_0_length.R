@@ -78,8 +78,8 @@ ggplot(dat) +
   theme(legend.position = "none")
 
 # ready to analyze!!
-mod1 <- gamm4(length ~  s(sst,  k=4) + s(julian, k =4),
-                random=~(1|year/day_site) + (1|bay_fac), data=dat)
+mod1 <- gamm4(length ~  s(sst,  k=4) + s(julian, k=4),
+                random=~(1|year/day_site), data=dat)
 
 gam.check(mod1$gam)
 plot(mod1$gam)
@@ -87,32 +87,29 @@ summary(mod1$gam)
 anova(mod1$gam)
 
 
-mod2 <- gamm4(length ~  s(sst,  k=4) + s(julian, k =4),
-              random=~(1|day_site) + (1|bay_fac), data=dat)
+mod2 <- gamm4(length ~  s(sst,  k=4) + s(julian, k=4) + bay_fac,
+              random=~(1|year/day_site), data=dat)
 
 gam.check(mod2$gam)
 plot(mod2$gam)
 summary(mod2$gam)
 anova(mod2$gam)
 
-mod3 <- gamm4(length ~  s(sst,  k=4) + s(julian, k =4) + bay_fac,
-              random=~(1|day_site), data=dat)
 
-gam.check(mod3$gam)
-plot(mod3$gam)
-summary(mod3$gam)
-anova(mod3$gam)
+AIC <- AIC(mod1$mer, mod2$mer) # mod 5 appears best
+AIC
 
-mod4 <- gamm4(length ~  s(sst,  k=4) + s(julian, k =4),
-              random=~(1|year/day_site), data=dat)
+AIC_table <- data.frame(response = "age 0 length",
+                        model = c("s(sst,  k=4) + s(julian, k=4), random=~(1|year/day_site)",
+                                  "s(sst,  k=4) + s(julian, k=4) + bay_fac, random=~(1|year/day_site)"),
+                        AIC = AIC$AIC,
+                        delta_AIC = (AIC$AIC - min(AIC$AIC)))
 
-gam.check(mod4$gam)
-plot(mod4$gam)
-summary(mod4$gam)
-anova(mod4$gam)
+AIC_table <- AIC_table %>%
+  arrange(delta_AIC)
 
-
-AIC(mod1$mer, mod2$mer, mod3$mer, mod4$mer) # mod 3 appears best
+# save
+write.csv(AIC_table, "age_length_AIC_table.csv", row.names = F)
 
 # predict and plot
 
@@ -120,7 +117,7 @@ new_dat <- data.frame(sst = seq(min(dat$sst), max(dat$sst), length.out = 100),
                       julian = mean(dat$julian),
                       bay_fac = "Balboa") # predicting for spawning weight
 
-pred <- predict(mod3$gam, newdata = new_dat, se.fit = T)
+pred <- predict(mod2$gam, newdata = new_dat, se.fit = T)
 
 plot <- data.frame(sst = new_dat$sst,
                           estimate = pred$fit, 
