@@ -98,7 +98,7 @@ summary(mod2$gam)
 anova(mod2$gam)
 
 
-AIC <- AIC(mod1$mer, mod2$mer) # mod 5 appears best
+AIC <- AIC(mod1$mer, mod2$mer) # mod 2 appears best
 AIC
 
 AIC_table <- data.frame(response = "age 0 length",
