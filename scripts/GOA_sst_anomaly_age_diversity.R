@@ -94,6 +94,7 @@ plot <- data.frame(sst3 = new_dat$sst3,
 
 ggplot(plot) +
   aes(x = sst3, y = estimate) +
+  geom_point(data = dat_lag, aes(x = sst3, y = shannon), size = 2.5) +
   geom_ribbon(aes(ymin = LCI, ymax = UCI), alpha = 0.2, lty = 0) +
   geom_line(size = 1, color = cb[7]) +
   labs(x = "Three year running mean SST anomaly", y = "Shannon age diversity") 
