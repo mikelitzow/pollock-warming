@@ -228,6 +228,8 @@ dat$sex.code <- if_else(dat$Sex == 1, 1,
                                 if_else(dat$Sex == "Male", 1, 
                                         ifelse(dat$Sex == "Female", 2, NA))))
 
+dat$sex.code <- as.factor(dat$sex.code)
+
 table(dat$Sex, dat$maturity_table_3)
 
 table(dat$sex.code, dat$maturity_table_3)
@@ -383,9 +385,7 @@ sst <- read.csv("./data/monthly_western_GOA_SST_anomalies_wrt_1980-2021.csv")
 sst$winter.yr <- ifelse(sst$month > 3, sst$year + 1, sst$year)
 
 
-
-
-# now need to scale weights by age and maturity stage
+# now need to scale weights by age and sex
 
 # first, clean up - only known sex, known age, age 4-10,
 # stages developing - spent
@@ -418,13 +418,14 @@ mature.weights[which.min(mature.weights$log.weight),] # one value of weight = 0!
 mature.weights <- mature.weights %>%
   dplyr::filter(weight > 0)
 
-# need to scale weight by age
-mature.weights <- plyr::ddply(mature.weights, "Age", transform, sc.weight = scale(log.weight))
+# need to scale weight by age and sex
+mature.weights <- plyr::ddply(mature.weights, c("Age", "sex.code"), transform, sc.weight = scale(log.weight))
 
 # check
-ggplot(mature.weights, aes(log.weight, sc.weight)) +
+ggplot(mature.weights.test, aes(log.weight, sc.weight, color = as.factor(sex.code))) +
   geom_point() +
   facet_wrap(~Age, scales = "free")
+
 
 #  model the progression of weight for each year class through time
 
@@ -489,10 +490,3 @@ ggplot(all.dat[which(all.dat$sex.code==1),], aes(maturity_table_3)) + geom_bar()
 ggplot(all.dat[which(all.dat$sex.code==2),], aes(maturity_table_3)) + geom_bar() + facet_wrap(~year)
 
 #not too many in each year but across yrs should be ok
-
-
-
-
-
-
-
