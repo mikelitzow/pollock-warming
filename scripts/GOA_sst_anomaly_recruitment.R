@@ -96,3 +96,64 @@ anova(mod6$gam)
 
 AIC <- AIC (mod1, mod2, mod3, mod4, mod5, mod6)
 AIC
+
+
+AIC_table <- data.frame(response = "log_age1_recruits",
+                        model = c("s(sst_annual_lag1,  k=5), correlation = corAR1()",
+                                  "s(sst_annual_lag2,  k=5), correlation = corAR1()",
+                                  "s(sst_annual_2yr_mean,  k=5), correlation = corAR1())",
+                                  "s(sst_winter_lag0,  k=5), correlation = corAR1()",
+                                  "s(sst_winter_lag1,  k=5), correlation = corAR1()",
+                                  "s(sst_winter_2yr_mean,  k=5), correlation = corAR1()"),
+                        AIC = AIC$AIC,
+                        delta_AIC = (AIC$AIC - min(AIC$AIC)))
+
+AIC_table <- AIC_table %>%
+  arrange(delta_AIC)
+
+# save
+write.csv(AIC_table, "./output/recruitment_AIC_table.csv", row.names = F)
+
+# predict and plot
+
+new_dat <- data.frame(sst_winter_2yr_mean = seq(min(dat$sst_winter_2yr_mean), max(dat$sst_winter_2yr_mean), length.out = 100)) 
+
+pred <- predict(mod6$gam, newdata = new_dat, se.fit = T)
+
+plot <- data.frame(sst_winter_2yr_mean = new_dat$sst_winter_2yr_mean,
+                   estimate = pred$fit, 
+                   LCI = pred$fit - 1.96*pred$se.fit,
+                   UCI = pred$fit + 1.96*pred$se.fit)
+
+
+ggplot(plot) +
+  aes(x = sst_winter_2yr_mean, y = estimate) +
+  geom_point(data = dat, aes(x = sst_winter_2yr_mean, y = log_recruits), size = 2.5) +
+  geom_ribbon(aes(ymin = LCI, ymax = UCI), alpha = 0.2, lty = 0) +
+  geom_line(size = 1, color = cb[7]) +
+  labs(x = "Two year running mean winter SST anomaly", y = "Log age1 recruits") 
+
+ggsave("./figs/log_recruits_goa_SST_anomaly.png", width = 6, height = 4, units = 'in')
+
+# refit best model to scaled data
+
+dat_scaled <- dat %>%
+  mutate(scaled_recruitment = scale(log_recruits))
+
+mod7 <- gamm(scaled_recruitment ~  s(sst_winter_2yr_mean,  k=5),
+             correlation = corAR1(), data=dat_scaled)
+
+pred <- predict(mod7$gam, newdata = new_dat, se.fit = T)
+
+plot <- data.frame(sst_winter_2yr_mean = new_dat$sst_winter_2yr_mean,
+                   estimate = pred$fit, 
+                   LCI = pred$fit - 1.96*pred$se.fit,
+                   UCI = pred$fit + 1.96*pred$se.fit)
+
+
+ggplot(plot) +
+  aes(x = sst_winter_2yr_mean, y = estimate) +
+  geom_ribbon(aes(ymin = LCI, ymax = UCI), alpha = 0.2, lty = 0) +
+  geom_line(size = 1, color = cb[7]) +
+  labs(x = "Three year running mean SST anomaly", y = "Scaled log recruitment") 
+
