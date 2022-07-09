@@ -111,7 +111,7 @@ AIC_table <- AIC_table %>%
   arrange(delta_AIC)
 
 # save
-write.csv(AIC_table, "age_length_AIC_table.csv", row.names = F)
+write.csv(AIC_table, "./output/age0_length_AIC_table.csv", row.names = F)
 
 # predict and plot
 
