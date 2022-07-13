@@ -23,12 +23,12 @@ d1 <- read.csv("./data/regional_north_pacific_ersst_anomaly_time_series.csv")
 d1 <- d1 %>%
   dplyr::filter(region == "Gulf_of_Alaska") %>%
   dplyr::select(year, annual.anomaly.unsmoothed) %>%
-  rename(sst = annual.anomaly.unsmoothed) %>%
-  mutate(sst2 = zoo::rollmean(sst, 2, align = "right", fill = NA),
-         sst3 = zoo::rollmean(sst, 3, align = "right", fill = NA))
+  rename(sst = annual.anomaly.unsmoothed) %>% # year of observation
+  mutate(sst2 = zoo::rollmean(sst, 2, align = "right", fill = NA), # year of and year before
+         sst3 = zoo::rollmean(sst, 3, align = "right", fill = NA)) #
 
 
-# lag shannon one year to match sst
+# lag shannon one year to match previous year sst
 dat_lag <- dat %>%
   mutate(year = year - 1)
 
@@ -38,7 +38,7 @@ dat_lag <- left_join(dat_lag, d1) %>%
 
 
 # now model
-mod1 <- gamm(shannon ~  s(sst,  k=4),
+mod1 <- gamm(shannon ~  s(sst,  k=4), # 2020 diversity compared with 2019 sst
               correlation = corAR1(), data=dat_lag)
 
 gam.check(mod1$gam)
@@ -47,7 +47,7 @@ summary(mod1$gam)
 anova(mod1$gam)
 
 
-mod2 <- gamm(shannon ~  s(sst2,  k=4),
+mod2 <- gamm(shannon ~  s(sst2,  k=4), # 2020 diversity compared with 2018-2019 sst
              correlation = corAR1(), data=dat_lag)
 
 gam.check(mod2$gam)
@@ -55,7 +55,7 @@ plot(mod2$gam)
 summary(mod2$gam)
 anova(mod2$gam)
 
-mod3 <- gamm(shannon ~  s(sst3,  k=4),
+mod3 <- gamm(shannon ~  s(sst3,  k=4), # 2020 diversity compared with 2017-2019 sst
              correlation = corAR1(), data=dat_lag)
 
 gam.check(mod3$gam)
