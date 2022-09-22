@@ -322,7 +322,7 @@ ggplot(dplyr::filter(develop.spawn.prespawn.spent, maturity_table_3 == 4), aes(a
   geom_histogram(fill = "grey90", color="black", stat = "count") + 
   facet_wrap(~year, scale = "free_y")
 
-ggplot(dplyr::filter(develop.spawn.prespawn.spent, maturity_table_3 == 2), aes(as.factor(Age))) +
+ggplot(dplyr::filter(develop.spawn.prespawn.spent, maturity_table_3 == 5), aes(as.factor(Age))) +
   geom_histogram(fill = "grey90", color="black", stat = "count") + 
   facet_wrap(~year, scale = "free_y")
 
@@ -333,12 +333,12 @@ ggplot(dplyr::filter(develop.spawn.prespawn.spent, maturity_table_3 == 2), aes(a
 
 # look at counts per year
 ggplot(dplyr::filter(spawn.prespawn, maturity_table_3 == 3,
-              Age %in% 4:10), aes(Age)) +
+              Age %in% 3:10), aes(Age)) +
   geom_histogram(fill = "grey90", color="black") + 
   facet_wrap(~year, scale = "free_y")
 
 ggplot(dplyr::filter(spawn.prespawn, maturity_table_3 == 4,
-              Age %in% 4:10), aes(Age)) +
+              Age %in% 3:10), aes(Age)) +
   geom_histogram(fill = "grey90", color="black") + 
   facet_wrap(~year, scale = "free_y")
 
