@@ -1,0 +1,3 @@
+"response","model","AIC","delta_AIC"
+"scaled_weight","s(prevyr_annual.SST, by=age_fac, k=4) + maturity_fac, random=~(1|year/Haul) + (1|cohort_fac)",50324.8511044101,0
+"scaled_weight","s(prevyr_annual.SST,  k=4) + maturity_fac, random=~(1|year/Haul) + (1|cohort_fac)",50328.1609028653,3.30979845521506

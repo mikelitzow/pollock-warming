@@ -1,0 +1,7 @@
+"response","model","AIC","delta_AIC"
+"log_age1_recruits","s(sst_winter_2yr_mean,  k=5), correlation = corAR1()",175.181470441165,0
+"log_age1_recruits","s(sst_winter_lag1,  k=5), correlation = corAR1()",180.106244804089,4.92477436292432
+"log_age1_recruits","s(sst_annual_lag1,  k=5), correlation = corAR1()",181.889657095293,6.70818665412889
+"log_age1_recruits","s(sst_annual_2yr_mean,  k=5), correlation = corAR1())",181.999379796855,6.81790935569006
+"log_age1_recruits","s(sst_winter_lag0,  k=5), correlation = corAR1()",184.253824570075,9.07235412891066
+"log_age1_recruits","s(sst_annual_lag2,  k=5), correlation = corAR1()",186.13746388346,10.9559934422956

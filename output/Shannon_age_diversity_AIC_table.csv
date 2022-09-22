@@ -1,0 +1,4 @@
+"response","model","AIC","delta_AIC"
+"Shannon age diversity","s(sst_3yr_mean,  k=4), correlation = corAR1()",16.8437092791013,0
+"Shannon age diversity","s(sst_2yr_mean,  k=4), correlation = corAR1()",22.0500542430383,5.206344963937
+"Shannon age diversity","s(sst_unsmoothed,  k=4), correlation = corAR1()",26.0375782266141,9.19386894751285
