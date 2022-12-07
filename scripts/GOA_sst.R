@@ -17,7 +17,7 @@ library(oce)
 # download.file("https://coastwatch.pfeg.noaa.gov/erddap/griddap/nceiErsstv5.nc?sst[(1980-01-01):1:(2020-12-01T00:00:00Z)][(0.0):1:(0.0)][(54):1:(62)][(200):1:(226)]", "~temp")
 
 
-# download.file("https://coastwatch.pfeg.noaa.gov/erddap/griddap/nceiErsstv5.nc?sst[(1947-01-01):1:(2021-5-01T00:00:00Z)][(0.0):1:(0.0)][(20):1:(68)][(120):1:(250)]", "~temp")
+# download.file("https://coastwatch.pfeg.noaa.gov/erddap/griddap/nceiErsstv5.nc?sst[(1947-01-01):1:(2022-8-01T00:00:00Z)][(0.0):1:(0.0)][(20):1:(68)][(120):1:(250)]", "~temp")
 
 # paste into browser for windows!
 
@@ -29,6 +29,7 @@ library(oce)
 
 nc <- nc_open("./data/nceiErsstv5_6fc3_2e06_d3bf.nc")
 
+nc <- nc_open("./data/nceiErsstv5_0acf_1348_bf9d.nc")
 # 1980-2020 GOA version:
 # nc <- nc_open("./data/nceiErsstv5_7676_409f_f7a3.nc")
 
@@ -70,7 +71,7 @@ map('world2Hires',c('Canada', 'usa'), fill=T,xlim=c(130,250), ylim=c(20,66),add=
 
 # WGOA for cod/pollock paper
 
-drop <- lon > 210 | lat < 56 | lat > 58
+drop <- lon < 200 | lon > 210 | lat < 56 | lat > 58
 wSST <- SST
 wSST[,drop] <- NA
 
@@ -80,6 +81,20 @@ temp.mean <- colMeans(wSST, na.rm=T)
 z <- t(matrix(temp.mean,length(y)))  
 image.plot(x,y,z, col=oceColorsPalette(64), xlim=c(195,230), ylim=c(53,62))
 map('world2Hires',c('Canada', 'usa'), fill=T,xlim=c(130,250), ylim=c(20,66),add=T, lwd=1, col="lightyellow3")
+
+# limit to Jan - July
+
+jan.jun.wSST <- wSST[m %in% c("Jan", "Feb", "Mar", "Apr", "May", "Jun"),]
+
+jan.jun.yr <- yr[m %in% c("Jan", "Feb", "Mar", "Apr", "May", "Jun")]
+
+annual.wSST.jan.jun <- tapply(rowMeans(jan.jun.wSST, na.rm = T), jan.jun.yr, mean)
+
+# save
+save.dat <- data.frame(year = 1947:2022, sst = annual.wSST.jan.jun)
+write.csv(save.dat, "./data/annual.wSST.jan.jun.csv")
+
+
 
 # calculate monthly anomaly
 # remove seasonal means
