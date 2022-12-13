@@ -313,7 +313,7 @@ sstjoin <- sst_lagged[,c(1,5)]
 
 dat_lag <- left_join(all.dat, sstjoin)
 
-# try a combined model - separate smooths to each sex
+# model - separate smooths to each age
 mod1 <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by = age.factor, k=4) + maturity_table_3,
                 random=~(1|year/Haul) + (1|cohort), data=dat_lag) # model does not fit
 
@@ -321,12 +321,22 @@ mod1 <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by = age.factor, k=4) + maturit
 saveRDS(mod1, "./output/acoustic_trawl_weight_mod1.rds")
 weight_mod1 <- readRDS("./output/acoustic_trawl_weight_mod1.rds")
 
-gam.check(weight_mod1$gam)
-plot(weight_mod1$gam)
-summary(weight_mod1$gam)
-anova(weight_mod1$gam)
+gam.check(mod1$gam)
+plot(mod1$gam)
+summary(mod1$gam)
+anova(mod1$gam)
 
+# model - same smooth for all ages
+mod2 <- gamm4(sc.weight ~  s(prevyr_annual.wSST, k = 4) + maturity_table_3,
+              random=~(1|year/Haul) + (1|cohort), data=dat_lag) # model does not fit
 
-# try with random effect maturity:sex.code
-coBnoa <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by = sex.code, k=4),
-                random=~(1|year/Haul) + (1|cohort) + (1|sex.code/maturity_table_3), data=dat_lag) # no dice
+# save the model object
+saveRDS(mod2, "./output/acoustic_trawl_weight_mod2.rds")
+mod2 <- readRDS("./output/acoustic_trawl_weight_mod2.rds")
+
+gam.check(mod2$gam)
+plot(mod2$gam)
+summary(mod2$gam)
+anova(mod2$gam)
+
+AIC(mod1$mer, mod2$mer) # mod1 (age-specific smooths) is best
