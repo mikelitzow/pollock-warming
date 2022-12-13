@@ -422,7 +422,7 @@ mature.weights <- mature.weights %>%
 mature.weights <- plyr::ddply(mature.weights, c("Age", "sex.code"), transform, sc.weight = scale(log.weight))
 
 # check
-ggplot(mature.weights.test, aes(log.weight, sc.weight, color = as.factor(sex.code))) +
+ggplot(mature.weights, aes(log.weight, sc.weight, color = as.factor(sex.code))) +
   geom_point() +
   facet_wrap(~Age, scales = "free")
 
@@ -490,3 +490,4 @@ ggplot(all.dat[which(all.dat$sex.code==1),], aes(maturity_table_3)) + geom_bar()
 ggplot(all.dat[which(all.dat$sex.code==2),], aes(maturity_table_3)) + geom_bar() + facet_wrap(~year)
 
 #not too many in each year but across yrs should be ok
+
