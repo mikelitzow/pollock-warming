@@ -2,3 +2,5 @@ brm_weight_sst_male.rds
 brm_weight_sst_female.rds
 weight_mod1.rds
 weight_mod3.rds
+acoustic_trawl_weight_mod1.rds
+acoustic_trawl_weight_mod2.rds
