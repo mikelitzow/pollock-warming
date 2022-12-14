@@ -150,8 +150,10 @@ ggplot(plot.dat, aes(sst, weight)) +
   geom_line(color = "red") +
   geom_ribbon(aes(ymin = LCI,
                   ymax = UCI), fill = "grey", alpha = 0.3) +
-  labs(x = "SST (°C)",
+  labs(x = "January-June mean SST (°C)",
        y = "Weight (g)")
+
+ggsave("./figs/sst_age0_weight.png", width = 6, height = 4, units = "in")
 
 new.dat <- data.frame(length = mean(dat$length),
                       sst = seq(min(dat$sst), max(dat$sst), length.out = 100))
@@ -296,8 +298,8 @@ all.dat$age.factor <- as.factor(all.dat$Age)
 all.dat$maturity_table_3 <- as.factor(all.dat$maturity_table_3)
 all.dat$cohort <- as.factor(all.dat$year.class)
 
-#lag annual sst------
-#load sst data
+## lag annual sst
+# load sst data
 sst_lagged <- read.csv("./data/western.goa.sst.csv")
 
 
@@ -340,3 +342,190 @@ summary(mod2$gam)
 anova(mod2$gam)
 
 AIC(mod1$mer, mod2$mer) # mod1 (age-specific smooths) is best
+
+# plot mod1 and mod2 predicted effects on one multi-panel plot
+
+new.dat.mod1 <- data.frame(prevyr_annual.wSST = seq(min(dat_lag$prevyr_annual.wSST),
+                                               max(dat_lag$prevyr_annual.wSST),
+                                               length.out = 100),
+                      age.factor = as.factor(rep(4:10, each = 100)),
+                      maturity_table_3 = round(mean(as.numeric(as.character(dat_lag$maturity_table_3, 0)))))
+
+
+pred_mod1 <- predict(mod1$gam, se = T, newdata = new.dat.mod1)
+
+new.dat.mod2 <- data.frame(prevyr_annual.wSST = seq(min(dat_lag$prevyr_annual.wSST),
+                                               max(dat_lag$prevyr_annual.wSST),
+                                               length.out = 100),
+                      maturity_table_3 = round(mean(as.numeric(as.character(dat_lag$maturity_table_3, 0)))))
+
+pred_mod2 <- predict(mod2$gam, se = T, newdata = new.dat.mod2)
+
+plot_dat <- data.frame(age = rep(c("Age 4", "Age 5", "Age 6", "Age 7", "Age 8", "Age 9", "Age 10", "All ages"),
+                                 each = 100),
+                       sst = seq(min(dat_lag$prevyr_annual.wSST),
+                                 max(dat_lag$prevyr_annual.wSST),
+                                 length.out = 100),
+                       Anomaly = c(pred_mod1$fit, pred_mod2$fit),
+                       UCI = c(pred_mod1$fit+1.96*pred_mod1$se.fit, pred_mod2$fit+1.96*pred_mod2$se.fit),
+                       LCI = c(pred_mod1$fit-1.96*pred_mod1$se.fit, pred_mod2$fit-1.96*pred_mod2$se.fit)
+                       )
+
+plot_order <- data.frame(age = c("Age 4", "Age 5", "Age 6", "Age 7", "Age 8", "Age 9", "Age 10", "All ages"),
+                         order = 1:8)
+
+
+plot_dat <- left_join(plot_dat, plot_order)
+
+plot_dat$age <- reorder(plot_dat$age, plot_dat$order)
+
+ggplot(plot_dat, aes(sst, Anomaly)) +
+  geom_hline(yintercept = 0, lty = 2) +
+  geom_line(color = "red") +
+  geom_ribbon(aes(ymin = LCI,
+                  ymax = UCI), fill = "grey", alpha = 0.3) +
+  labs(x = "Previous year SST (°C)",
+       y = "Log weight anomaly") +
+  facet_wrap(~age)
+
+ggsave("./figs/sst_vs_weight-age_acoustic_trawl.png", width = 6, height = 5.3, units = 'in')
+
+
+## load observer data---------------
+
+dat1 <- read.csv("./data/pollock_bio_data_vessels.csv")
+
+dat2 <- read.csv("./data/DEBRIEFED_HAUL_vessels.csv")
+
+# restrict dat2 to GOA - NMFS area 610, 620, 630
+dat2 <- dat2 %>%
+  dplyr::filter(NMFS_AREA %in% c(610, 620, 630))
+
+
+# restrict dat1 to GOA hauls and !is.na(age)
+dat1 <- dat1 %>%
+  dplyr::filter(HAUL_JOIN %in% unique(dat2$HAUL_JOIN),
+         !is.na(AGE)) %>%
+  dplyr::select(HAUL_JOIN, SEX, LENGTH, WEIGHT, AGE)
+
+# combine dat1 and dat2
+dat2 <- dat2 %>%
+  select(HAUL_JOIN, YEAR, HAUL_DATE, NMFS_AREA)
+
+dat <- left_join(dat1, dat2)
+
+# limit to age 2-10, known sex, known weight, log-transform weight and scale by age
+weight.dat <- dat %>%
+  dplyr::filter(AGE %in% 2:10,
+         WEIGHT > 0, 
+         SEX %in% c("M", "F")) %>%
+  mutate(log_weight = log(WEIGHT))
+
+weight.dat <- plyr::ddply(weight.dat, c("SEX", "AGE"), transform, sc.weight = scale(log_weight))
+
+# check distributions - look good
+ggplot(weight.dat, aes(sc.weight)) +
+  geom_histogram(bins = 40, fill = "grey", color = "black") +
+  facet_wrap(~SEX, ncol = 1)
+
+# set cohort
+weight.dat$cohort <- weight.dat$YEAR - weight.dat$AGE 
+
+# set factors
+weight.dat$age.factor <- as.factor(weight.dat$AGE)
+weight.dat$cohort <- as.factor(weight.dat$cohort)
+
+## lag annual sst
+# load sst data
+sst_lagged <- read.csv("./data/western.goa.sst.csv")
+
+
+sst_lagged$prevyr_annual.wSST <- NA
+
+k<-1
+for(k in 1:length(sst_lagged$year)){
+  if(k>1){
+    sst_lagged$prevyr_annual.wSST[k] <- sst_lagged$annual.wSST[k-1] 
+  }
+} #works now join
+
+sstjoin <- sst_lagged[,c(1,5)] %>%
+  rename(YEAR = year)
+
+dat_lag <- left_join(weight.dat, sstjoin)
+
+# model - separate smooths to each age
+mod1 <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by = age.factor, k=4),
+              random=~(1|YEAR/HAUL_JOIN) + (1|cohort), data=dat_lag) # model does not fit
+
+# save the model object
+saveRDS(mod1, "./output/acoustic_trawl_weight_mod1.rds")
+weight_mod1 <- readRDS("./output/acoustic_trawl_weight_mod1.rds")
+
+gam.check(mod1$gam)
+plot(mod1$gam)
+summary(mod1$gam)
+anova(mod1$gam)
+
+# model - same smooth for all ages
+mod2 <- gamm4(sc.weight ~  s(prevyr_annual.wSST, k = 4) + maturity_table_3,
+              random=~(1|year/Haul) + (1|cohort), data=dat_lag) # model does not fit
+
+# save the model object
+saveRDS(mod2, "./output/acoustic_trawl_weight_mod2.rds")
+mod2 <- readRDS("./output/acoustic_trawl_weight_mod2.rds")
+
+gam.check(mod2$gam)
+plot(mod2$gam)
+summary(mod2$gam)
+anova(mod2$gam)
+
+AIC(mod1$mer, mod2$mer) # mod1 (age-specific smooths) is best
+
+# plot mod1 and mod2 predicted effects on one multi-panel plot
+
+new.dat.mod1 <- data.frame(prevyr_annual.wSST = seq(min(dat_lag$prevyr_annual.wSST),
+                                                    max(dat_lag$prevyr_annual.wSST),
+                                                    length.out = 100),
+                           age.factor = as.factor(rep(4:10, each = 100)),
+                           maturity_table_3 = round(mean(as.numeric(as.character(dat_lag$maturity_table_3, 0)))))
+
+
+pred_mod1 <- predict(mod1$gam, se = T, newdata = new.dat.mod1)
+
+new.dat.mod2 <- data.frame(prevyr_annual.wSST = seq(min(dat_lag$prevyr_annual.wSST),
+                                                    max(dat_lag$prevyr_annual.wSST),
+                                                    length.out = 100),
+                           maturity_table_3 = round(mean(as.numeric(as.character(dat_lag$maturity_table_3, 0)))))
+
+pred_mod2 <- predict(mod2$gam, se = T, newdata = new.dat.mod2)
+
+plot_dat <- data.frame(age = rep(c("Age 4", "Age 5", "Age 6", "Age 7", "Age 8", "Age 9", "Age 10", "All ages"),
+                                 each = 100),
+                       sst = seq(min(dat_lag$prevyr_annual.wSST),
+                                 max(dat_lag$prevyr_annual.wSST),
+                                 length.out = 100),
+                       Anomaly = c(pred_mod1$fit, pred_mod2$fit),
+                       UCI = c(pred_mod1$fit+1.96*pred_mod1$se.fit, pred_mod2$fit+1.96*pred_mod2$se.fit),
+                       LCI = c(pred_mod1$fit-1.96*pred_mod1$se.fit, pred_mod2$fit-1.96*pred_mod2$se.fit)
+)
+
+plot_order <- data.frame(age = c("Age 4", "Age 5", "Age 6", "Age 7", "Age 8", "Age 9", "Age 10", "All ages"),
+                         order = 1:8)
+
+
+plot_dat <- left_join(plot_dat, plot_order)
+
+plot_dat$age <- reorder(plot_dat$age, plot_dat$order)
+
+ggplot(plot_dat, aes(sst, Anomaly)) +
+  geom_hline(yintercept = 0, lty = 2) +
+  geom_line(color = "red") +
+  geom_ribbon(aes(ymin = LCI,
+                  ymax = UCI), fill = "grey", alpha = 0.3) +
+  labs(x = "Previous year SST (°C)",
+       y = "Log weight anomaly") +
+  facet_wrap(~age)
+
+ggsave("./figs/sst_vs_weight-age_acoustic_trawl.png", width = 6, height = 5.3, units = 'in')
+
