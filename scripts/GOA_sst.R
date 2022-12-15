@@ -13,8 +13,8 @@ library(oce)
 # script for calculating GOA sst anomalies wrt 1951-1980
 # download.file("https://coastwatch.pfeg.noaa.gov/erddap/griddap/nceiErsstv5.nc?sst[(1900-01-01):1:(2020-12-01T00:00:00Z)][(0.0):1:(0.0)][(54):1:(62)][(200):1:(226)]", "~temp")
 
-# 1980-2020 version
-# download.file("https://coastwatch.pfeg.noaa.gov/erddap/griddap/nceiErsstv5.nc?sst[(1980-01-01):1:(2020-12-01T00:00:00Z)][(0.0):1:(0.0)][(54):1:(62)][(200):1:(226)]", "~temp")
+# 1980-2021 version
+# download.file("https://coastwatch.pfeg.noaa.gov/erddap/griddap/nceiErsstv5.nc?sst[(1980-01-01):1:(2021-12-01T00:00:00Z)][(0.0):1:(0.0)][(54):1:(62)][(200):1:(226)]", "~temp")
 
 
 # download.file("https://coastwatch.pfeg.noaa.gov/erddap/griddap/nceiErsstv5.nc?sst[(1947-01-01):1:(2022-8-01T00:00:00Z)][(0.0):1:(0.0)][(20):1:(68)][(120):1:(250)]", "~temp")
@@ -27,9 +27,11 @@ library(oce)
 
 # nc <- nc_open("./data/nceiErsstv5_130f_00d5_4da1.nc")
 
-nc <- nc_open("./data/nceiErsstv5_6fc3_2e06_d3bf.nc")
+# nc <- nc_open("./data/nceiErsstv5_6fc3_2e06_d3bf.nc")
 
-nc <- nc_open("./data/nceiErsstv5_0acf_1348_bf9d.nc")
+nc <- nc_open("./data/nceiErsstv5_6fc3_2e06_d3bf_1.nc")
+
+# nc <- nc_open("./data/nceiErsstv5_0acf_1348_bf9d.nc")
 # 1980-2020 GOA version:
 # nc <- nc_open("./data/nceiErsstv5_7676_409f_f7a3.nc")
 
@@ -82,7 +84,7 @@ z <- t(matrix(temp.mean,length(y)))
 image.plot(x,y,z, col=oceColorsPalette(64), xlim=c(195,230), ylim=c(53,62))
 map('world2Hires',c('Canada', 'usa'), fill=T,xlim=c(130,250), ylim=c(20,66),add=T, lwd=1, col="lightyellow3")
 
-# limit to Jan - July
+# limit to Jan - June
 
 jan.jun.wSST <- wSST[m %in% c("Jan", "Feb", "Mar", "Apr", "May", "Jun"),]
 
@@ -133,7 +135,7 @@ apr.jul.yr <- yr[m %in% c("Apr", "May", "Jun", "Jul")]
 apr.jul.wSST <- wSST[m %in% c("Apr", "May", "Jun", "Jul")]
 apr.jul.wSST <- tapply(apr.jul.wSST, apr.jul.yr, mean)
 
-xprt <- data.frame(year=1900:2020,
+xprt <- data.frame(year=1980:2021,
                    apr.jul.wSST=apr.jul.wSST)
 
 ggplot(xprt, aes(year, apr.jul.wSST)) +
