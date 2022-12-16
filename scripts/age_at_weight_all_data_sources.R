@@ -1,9 +1,13 @@
 # three data sources: beach seines, acoustic trawl, observer data 
 
 library(tidyverse)
-theme_set(theme_bw())
 library(mgcv)
+library(lme4)
+library(lemon)
+library(gamm4)
 
+theme_set(theme_bw())
+cb <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
 ## age-0 pollock data from beach seines--------------
 
@@ -35,6 +39,10 @@ names(dat) <- str_to_lower(names(dat))
 # add julian day
 dat$julian <- lubridate::yday(lubridate::parse_date_time(dat$date, orders="mdy"))
 
+# save julian day for combined histogram
+
+seine_hist <- data.frame(data = "Beach seine",
+                         julian = dat$julian)
 
 # set up some factors for analysis
 dat$bay_fac <- as.factor(dat$bay)
@@ -161,7 +169,8 @@ ggsave("./figs/sst_age0_weight.png", width = 6, height = 4, units = "in")
 
 # save data for rug plot
 rug_seine <- data.frame(data = "Beach seine",
-                        sst = unique(dat$sst))
+                        sst = unique(dat$sst), 
+                        age = "Age 0")
 
 ## now acoustic trawl data ----------------------------------------
 
@@ -328,6 +337,10 @@ sstjoin <- sst_lagged[,c(1,4)]
 
 dat_lag <- left_join(all.dat, sstjoin)
 
+# save julian dates for histogram
+acoustic_hist <- data.frame(data = "Acoustic trawl",
+                         julian = dat_lag$julian)
+
 # model - separate smooths to each age
 mod1 <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by = age.factor, k=4) + maturity_table_3,
                 random=~(1|year/Haul) + (1|cohort), data=dat_lag) # model does not fit
@@ -398,7 +411,9 @@ ggsave("./figs/sst_vs_weight-age_acoustic_trawl.png", width = 6, height = 5.3, u
 
 # save data for rug plot
 rug_acoustic <- data.frame(data = "Acoustic trawl", 
-                           sst = unique(dat_lag$prevyr_annual.wSST))
+                           sst = unique(dat_lag$prevyr_annual.wSST),
+                           age = rep(c("Age 4", "Age 5", "Age 6", "Age 7", "Age 8", "Age 9", "Age 10"), 
+                                     each = length(unique(dat_lag$prevyr_annual.wSST))))
 
 ## load observer data---------------
 
@@ -431,6 +446,9 @@ weight.dat <- dat %>%
   mutate(log_weight = log(WEIGHT))
 
 weight.dat <- plyr::ddply(weight.dat, c("SEX", "AGE"), transform, sc.weight = scale(log_weight))
+
+# get julian day
+weight.dat$julian <- lubridate::yday(chron::dates(weight.dat$HAUL_DATE))
 
 # check distributions - look good
 ggplot(weight.dat, aes(sc.weight)) +
@@ -473,10 +491,14 @@ ggplot(dat_lag, aes(prevyr_annual.wSST, sc.weight)) +
   geom_smooth(method = lm, se = F) +
   facet_wrap(~AGE)
 
-# try linear mixed-effects model
-library(lme4)
+# save data for historgrams
+observer_hist <- data.frame(data = "Commercial catch",
+                         julian = dat_lag$julian)
 
-mod1 <- lme4::lmer(sc.weight ~ prevyr_annual.wSST:age.factor + (1|year.factor/haul.factor) + (1|cohort), 
+
+# try linear mixed-effects model
+
+mod1 <- lmer(sc.weight ~ prevyr_annual.wSST:age.factor + (1|year.factor/haul.factor) + (1|cohort), 
                    data = dat_lag)
 
 fixef(mod1)
@@ -540,4 +562,97 @@ ggplot(plot_dat_observer, aes(sst, Effect)) +
        y = "Log weight anomaly") +
   facet_wrap(~Age)
 
+# save sst data for rug plot
+rug_observer <- data.frame(data = "Commercial catch",
+                           sst = unique(dat_lag$prevyr_annual.wSST),
+                           age = rep(c("Age 2", "Age 3", "Age 4", "Age 5", "Age 6", "Age 7", "Age 8", "Age 9", "Age 10"),
+                                     each = length(unique(dat_lag$prevyr_annual.wSST))))
 
+## combine plot--------------
+
+# combine plot data
+head(plot_dat_seine)
+head(plot_dat_acoustic)
+head(plot_dat_observer)
+
+# clean up and combine
+plot_dat_seine$age = "Age 0"
+plot_dat_seine$data = "Beach seine"
+
+names(plot_dat_acoustic)[3] = "effect"
+plot_dat_acoustic$data = "Acoustic trawl"
+
+names(plot_dat_observer)[2:3] <- c("age", "effect")
+plot_dat_observer$data = "Commercial catch"
+
+plot_dat_acoustic <- plot_dat_acoustic %>%
+  select(sst, effect, LCI, UCI, age, data)
+
+plot_dat_observer <- plot_dat_observer %>%
+  select(sst, effect, LCI, UCI, age, data)
+
+plot_all <- rbind(plot_dat_seine,
+                  plot_dat_acoustic,
+                  plot_dat_observer)
+
+plot_order <- data.frame(age = c("Age 0", "Age 2", "Age 3", "Age 4", "Age 5", "Age 6", "Age 7", "Age 8", "Age 9", "Age 10"),
+                         order = 1:10)
+
+plot_all <- left_join(plot_all, plot_order)
+
+plot_all$age <- reorder(plot_all$age, plot_all$order)
+
+data_order <- data.frame(data = c("Beach seine", "Acoustic trawl", "Commercial catch"),
+                         data_order = 1:3)
+
+plot_all <- left_join(plot_all, data_order)
+
+plot_all$data <- reorder(plot_all$data, plot_all$data_order)
+
+# and combine rug plots
+rug_all <- rbind(rug_seine,
+                 rug_acoustic,
+                 rug_observer)
+
+rug_all <- left_join(rug_all, plot_order)
+
+rug_all$age <- reorder(rug_all$age, rug_all$order)
+
+my.col <- cb[c(4,2,6)]
+
+plot <- ggplot(plot_all, aes(sst, effect, fill = data, color = data)) +
+  geom_hline(yintercept = 0, lty = 2) +
+  geom_line() +
+  geom_ribbon(aes(ymin = LCI, ymax = UCI), alpha = 0.2, lty = 0) +
+  labs(x = "SST (°C)",
+       y = "Log weight anomaly") +
+  geom_rug(data = rug_all, aes(x = sst, y = NULL))  +
+  facet_wrap(~age, scales = "free_x", ncol = 4) +
+  theme(legend.title = element_blank()) + 
+  scale_color_manual(values = my.col) +
+  scale_fill_manual(values = my.col)
+
+png("./figs/combined_sst_weight_age_plot.png", width = 6, height = 5, units = 'in', res = 300)
+plot2 <-  reposition_legend(plot, position = 'top right', panel='panel-4-3')
+dev.off()
+
+# plot combined histogram
+all_hist <- rbind(seine_hist, acoustic_hist, observer_hist)
+
+all_hist <- left_join(all_hist, data_order)
+
+all_hist$data <- reorder(all_hist$data, all_hist$data_order)
+
+# get total sample size
+n_total <- all_hist
+
+ggplot(all_hist, aes(julian, fill = data)) +
+  geom_histogram(bins = 100, alpha = 0.4, color = "black") +
+  facet_wrap(~data, ncol = 1, scales = "free_y") +
+  scale_fill_manual(values = my.col) +
+  theme(legend.position = "none") +
+  labs(x = "Day of year", 
+       y = "Count") +
+  scale_x_continuous(breaks = c(1, seq(30, 360, by = 30)))
+
+ggsave("./figs/weight_seasonal_histograms.png", width = 5, height = 5, units = 'in')
