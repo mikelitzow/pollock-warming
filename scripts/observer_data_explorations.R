@@ -215,3 +215,21 @@ MuMIn::AICc(mod1, mod2, mod3) # ain't no denying - mod3 best by far
 summary(mod3)
 plot(mod3, residuals = T, pch = 19)
 
+## scaled weight at age as a function of SST ------------------------
+
+# check range of weights and ages
+
+ggplot(dat, aes(WEIGHT)) +
+  geom_histogram(bins = 50, fill = "grey", color = "black")
+# looks fine, all in kg
+
+ggplot(dat, aes(AGE)) +
+  geom_histogram(bins = 18, fill = "grey", color = "black")
+
+# limit to age 2-10, log-transform weight and scale by age
+weight.dat <- dat %>%
+  filter(AGE %in% 2:10) %>%
+  mutate(log_weight = log(WEIGHT))
+  
+weight.dat <- plyr::ddply(weight.dat, c("SEX", "AGE"), transform, sc.weight = scale(log_weight))
+  
