@@ -88,6 +88,9 @@ plot_dat <- data.frame(year = 1950:2022,
                        Annual = annual.wSST) %>%
   pivot_longer(cols = -year)
 
+# save 
+write.csv(plot_dat, "./figs/western.goa.sst.1950.2022.csv", row.names = F)
+
 ann_clim <- mean(annual.wSST[names(annual.wSST) < 2000])
 jan.jun.clim <- mean(annual.wSST.jan.jun[names(annual.wSST.jan.jun) < 2000])
 
