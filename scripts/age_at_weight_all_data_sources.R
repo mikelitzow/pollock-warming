@@ -44,6 +44,33 @@ dat$julian <- lubridate::yday(lubridate::parse_date_time(dat$date, orders="mdy")
 seine_hist <- data.frame(data = "Beach seine",
                          julian = dat$julian)
 
+
+# save lat/long for site fig
+bay <- read.csv("./data/bay_lat_long.csv", row.names = 1) %>%
+  rename(bay = Bay)
+
+unique(bay$bay)
+unique(dat$bay)
+
+# align names
+change <- bay$bay == "Port Wrangell"
+bay$bay[change] <- "Pt Wrangell"
+
+change <- bay$bay == "Ugak "
+bay$bay[change] <- "Ugak"
+
+change <- dat$bay == "Ugak "
+dat$bay[change] <- "Ugak"
+
+seine_loc <- left_join(dat, bay) %>% 
+  select(bay, lat, lon) %>%
+  filter(!bay %in% c("Falmouth", "Baralof")) %>%
+  group_by(bay) %>%
+  summarise(lat = mean(lat), long = mean(lon)) %>%
+  select(-bay) %>%
+  mutate(data = "Beach seine")
+
+
 # set up some factors for analysis
 dat$bay_fac <- as.factor(dat$bay)
 dat$sst_fac <- as.factor(dat$sst)
@@ -256,11 +283,13 @@ dat$sex.code <- if_else(dat$Sex == 1, 1,
 
 # first, clean up - only known sex, known age, age 4-10,
 # stages developing - spent
+# longitude 158 - 150 W (Shelikof and Kodiak)
 
 mature.weights <- dat %>%
   dplyr::filter(maturity_table_3 %in% 2:5,
          Age %in% 4:10,
-         sex.code %in% 1:2)
+         sex.code %in% 1:2,
+         Longitude < -150 & Longitude > -158)
 
 # log transform weight
 mature.weights$log.weight <- log(mature.weights$weight)
@@ -340,6 +369,14 @@ dat_lag <- left_join(all.dat, sstjoin)
 # save julian dates for histogram
 acoustic_hist <- data.frame(data = "Acoustic trawl",
                          julian = dat_lag$julian)
+
+# Save locations
+acoustic_loc <- dat_lag %>%
+  mutate(data = "Acoustic trawl") %>%
+  rename(lat = Latitude,
+         long = Longitude) %>%
+  select(data, lat, long)
+  
 
 # model - separate smooths to each age
 mod1 <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by = age.factor, k=4) + maturity_table_3,
@@ -434,7 +471,9 @@ dat1 <- dat1 %>%
 
 # combine dat1 and dat2
 dat2 <- dat2 %>%
-  select(HAUL_JOIN, YEAR, HAUL_DATE, NMFS_AREA)
+  select(HAUL_JOIN, YEAR, HAUL_DATE, NMFS_AREA, GEAR_RETRIEVAL_LATDD, GEAR_RETRIEVAL_LONDD) %>%
+  rename(lat = GEAR_RETRIEVAL_LATDD,
+         long = GEAR_RETRIEVAL_LONDD)
 
 dat <- left_join(dat1, dat2)
 
@@ -491,10 +530,15 @@ ggplot(dat_lag, aes(prevyr_annual.wSST, sc.weight)) +
   geom_smooth(method = lm, se = F) +
   facet_wrap(~AGE)
 
-# save data for historgrams
+# save data for histograms
 observer_hist <- data.frame(data = "Commercial catch",
                          julian = dat_lag$julian)
 
+
+# save lat-long for maps
+observer_loc <- data.frame(data = "Commercial catch",
+                           lat = dat_lag$lat,
+                           long = dat_lag$long)
 
 # try linear mixed-effects model
 
@@ -644,11 +688,24 @@ all_hist <- left_join(all_hist, data_order)
 all_hist$data <- reorder(all_hist$data, all_hist$data_order)
 
 # get total sample size
-n_total <- all_hist
+n_total <- all_hist %>%
+  group_by(data) %>%
+  summarise(n = prettyNum(n(), big.mark = ",")) 
+
+
+all_hist <- left_join(all_hist, n_total) %>%
+  mutate(label = paste(data, " (n = ", n, ")", sep = ""))
+
+
+
+all_hist <- left_join(all_hist, data_order)
+
+all_hist$data <- reorder(all_hist$data, all_hist$data_order)
+all_hist$label <- reorder(all_hist$label, all_hist$data_order)
 
 ggplot(all_hist, aes(julian, fill = data)) +
   geom_histogram(bins = 100, alpha = 0.4, color = "black") +
-  facet_wrap(~data, ncol = 1, scales = "free_y") +
+  facet_wrap(~label, ncol = 1, scales = "free_y") +
   scale_fill_manual(values = my.col) +
   theme(legend.position = "none") +
   labs(x = "Day of year", 
@@ -656,3 +713,74 @@ ggplot(all_hist, aes(julian, fill = data)) +
   scale_x_continuous(breaks = c(1, seq(30, 360, by = 30)))
 
 ggsave("./figs/weight_seasonal_histograms.png", width = 5, height = 5, units = 'in')
+
+## plot sample sites ------------------------------------
+
+# flip sign for seine long
+seine_loc$long <- -seine_loc$long
+
+# reduce acoustic and observer locations to one per tow
+acoustic_plot <- acoustic_loc %>%
+  mutate(index = paste(lat, long, sep = "_")) %>%
+  group_by(index) %>%
+  summarise(lat = mean(lat),
+            long = mean(long)) %>%
+  mutate(data = "Acoustic trawl") %>%
+  select(data, lat, long)
+
+nrow(acoustic_loc); nrow(acoustic_plot)
+
+observer_plot <- observer_loc %>%
+  mutate(index = paste(lat, long, sep = "_")) %>%
+  group_by(index) %>%
+  summarise(lat = mean(lat),
+            long = mean(long)) %>%
+  mutate(data = "Commercial catch") %>%
+  select(data, lat, long)
+
+nrow(observer_loc); nrow(observer_plot)
+
+plot_loc <- rbind(seine_loc,
+                  acoustic_plot,
+                  observer_plot)
+
+# arrange and set up plot 
+plot_loc <- left_join(plot_loc, data_order)
+plot_loc$data <- reorder(plot_loc$data, plot_loc$data_order)
+
+# set up point shapes and alpha
+plot_loc <- plot_loc %>%
+  mutate(shape = if_else(data == "Beach seine", 21, 3),
+         alpha = if_else(data == "Beach seine", 1, 0.2),
+         size = if_else(data == "Beach seine", 2,
+                        if_else(data == "Acoustic trawl", 1, 0.7)),
+         color = if_else(data == "Beach seine", "black",
+                         if_else(data == "Acoustic trawl", my.col[2], my.col[3])),
+         fill = if_else(data == "Beach seine", my.col[1], "black"))
+
+
+library("rnaturalearth")
+library("rnaturalearthdata")
+library( "ggspatial" )
+library("sf")
+
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+#bigger map
+ggplot(data = world) +
+  geom_sf(fill = "gray50") +
+  coord_sf(xlim = c(-171, -148), ylim = c(52, 60.5), expand = TRUE) +
+  # annotation_scale(location = "bl", width_hint = 0.5) +
+  # annotation_north_arrow(location = "bl", which_north = "true",
+  #                        pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+  #                        style = north_arrow_fancy_orienteering) +
+  geom_point(aes(long, lat), data=plot_loc,
+             shape = plot_loc$shape,
+             fill = plot_loc$fill,
+             color = plot_loc$color,
+             size = plot_loc$size,
+             alpha = plot_loc$alpha) +
+  facet_wrap(~data, ncol = 1) +
+  theme(axis.title = element_blank())
+
+ggsave("./figs/weight_study_site_maps.png", width = 4, height = 7, units = 'in')
