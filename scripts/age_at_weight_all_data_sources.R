@@ -540,6 +540,13 @@ observer_loc <- data.frame(data = "Commercial catch",
                            lat = dat_lag$lat,
                            long = dat_lag$long)
 
+# fit model for plotting time series
+obs_mean_mod <- lmer(log_weight ~ year.factor + (1|haul.factor), 
+                     data = filter(dat_lag, age.factor == 4))
+
+effects_mean <- effects::effect(term= "year.factor", mod = obs_mean_mod)
+summary(effects_mean)
+
 # try linear mixed-effects model
 
 mod1 <- lmer(sc.weight ~ prevyr_annual.wSST:age.factor + (1|year.factor/haul.factor) + (1|cohort), 
