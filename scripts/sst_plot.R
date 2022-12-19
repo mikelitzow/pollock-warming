@@ -10,6 +10,7 @@ library(chron)
 library(fields)
 library(ggplot2)
 library(oce)
+library(tidyverse)
 
 theme_set(theme_bw())
 cb <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
@@ -89,12 +90,12 @@ plot_dat <- data.frame(year = 1950:2022,
   pivot_longer(cols = -year)
 
 # save 
-write.csv(plot_dat, "./figs/western.goa.sst.1950.2022.csv", row.names = F)
+write.csv(plot_dat, "./data/western.goa.sst.1950.2022.csv", row.names = F)
 
 ann_clim <- mean(annual.wSST[names(annual.wSST) < 2000])
 jan.jun.clim <- mean(annual.wSST.jan.jun[names(annual.wSST.jan.jun) < 2000])
 
-ggplot(plot_dat, aes(year, value, color = name)) +
+temp <- ggplot(plot_dat, aes(year, value, color = name)) +
   geom_point() +
   geom_line() +
   geom_hline(yintercept = c(ann_clim, jan.jun.clim), 
@@ -109,3 +110,29 @@ ggplot(plot_dat, aes(year, value, color = name)) +
   labs(y = "SST (°C)")
 
 ggsave("./figs/sst_time_series.png", width = 5, height = 3.7, units = 'in')
+
+# add FAR and RR
+
+dat <- read.csv("./data/GOA_annual_FAR_Risk_Ratio_with_uncertainty.csv")
+
+
+
+ggplot(filter(dat, variable == "Fraction of Attributable Risk"), aes(Year, Estimate)) +
+  geom_line(color = "black") +
+  geom_point() +
+  geom_ribbon(aes(ymin = LCI, ymax = UCI), alpha = 0.2) +
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_x_continuous(breaks = seq(1950, 2020, by = 10)) +
+  theme(axis.title.x = element_blank()) +
+  ylab("Fraction of Attributable Risk")
+
+
+ggplot(filter(dat, variable == "Risk ratio"), aes(Year, Estimate)) +
+  geom_line(color = "black") +
+  geom_point() +
+  geom_ribbon(aes(ymin = LCI, ymax = UCI), alpha = 0.2) +
+  coord_trans(y = "pseudo_log") +
+  scale_y_continuous(breaks=c(1, 2, 5, 10, 20, 50, 100),
+                     minor_breaks = NULL) +
+  ylab("Risk ratio")
+
