@@ -83,6 +83,10 @@ ggplot(age.shannon, aes(YEAR, shannon)) +
   geom_line() +
   geom_point()
 
+
+# save
+write.csv(age.shannon, "./data/observer.age.diversity.csv", row.names = F)
+
 # load sst as a covariate
 sst <- read.csv("./data/monthly_western_GOA_SST_anomalies_wrt_1980-2021.csv")
 
