@@ -21,6 +21,9 @@ library(oce)
 
 # paste into browser for windows!
 
+# 1980-2021 version
+# download.file("https://coastwatch.pfeg.noaa.gov/erddap/griddap/nceiErsstv5.nc?sst[(1950-01-01):1:(2022-11-01T00:00:00Z)][(0.0):1:(0.0)][(54):1:(62)][(200):1:(226)]", "~temp")
+
 
 # load and process SST data
 # nc <- nc_open("~temp")
@@ -84,13 +87,21 @@ z <- t(matrix(temp.mean,length(y)))
 image.plot(x,y,z, col=oceColorsPalette(64), xlim=c(195,230), ylim=c(53,62))
 map('world2Hires',c('Canada', 'usa'), fill=T,xlim=c(130,250), ylim=c(20,66),add=T, lwd=1, col="lightyellow3")
 
-# limit to Jan - June
+# limit to Jan - June, winter, and annual
 
 jan.jun.wSST <- wSST[m %in% c("Jan", "Feb", "Mar", "Apr", "May", "Jun"),]
 
 jan.jun.yr <- yr[m %in% c("Jan", "Feb", "Mar", "Apr", "May", "Jun")]
 
 annual.wSST.jan.jun <- tapply(rowMeans(jan.jun.wSST, na.rm = T), jan.jun.yr, mean)
+
+winter.months <- c("Nov", "Dec", "Jan", "Feb", "Mar")
+
+winter.Wsst <- wSST[m %in% winter.months,]
+winter.year <- yr[m %in% winter.months]
+
+
+
 
 # save
 save.dat <- data.frame(year = 1947:2022, sst = annual.wSST.jan.jun)
