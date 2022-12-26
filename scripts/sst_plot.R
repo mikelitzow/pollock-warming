@@ -83,10 +83,16 @@ annual.wSST.jan.jun <- tapply(rowMeans(jan.jun.wSST, na.rm = T), jan.jun.yr, mea
 
 annual.wSST <- tapply(rowMeans(wSST, na.rm = T), yr, mean)
 
+# load winter sst
+winter.sst <- read.csv("./data/annual.wSST.winter.csv", row.names = 1)
+
+
+
 # plot
 plot_dat <- data.frame(year = 1950:2022, 
-                       `January-June` = annual.wSST.jan.jun,
-                       Annual = annual.wSST) %>%
+                       "January-June" = annual.wSST.jan.jun,
+                       Annual = annual.wSST,
+                       Winter = winter.sst$sst) %>%
   pivot_longer(cols = -year)
 
 # save 
@@ -94,11 +100,16 @@ write.csv(plot_dat, "./data/western.goa.sst.1950.2022.csv", row.names = F)
 
 ann_clim <- mean(annual.wSST[names(annual.wSST) < 2000])
 jan.jun.clim <- mean(annual.wSST.jan.jun[names(annual.wSST.jan.jun) < 2000])
+win_clim <- mean(winter.sst$sst[winter.sst$year < 2000])
+
+# remove Jan - April
+plot_dat <- plot_dat %>%
+  filter(name %in% c("Annual", "Winter"))
 
 temp <- ggplot(plot_dat, aes(year, value, color = name)) +
   geom_point() +
   geom_line() +
-  geom_hline(yintercept = c(ann_clim, jan.jun.clim), 
+  geom_hline(yintercept = c(ann_clim, win_clim), 
              lty = 2,
              color = cb[c(1,7)]) +
   scale_color_manual(values = cb[c(1,7)]) +
