@@ -32,7 +32,9 @@ library(oce)
 
 # nc <- nc_open("./data/nceiErsstv5_6fc3_2e06_d3bf.nc")
 
-nc <- nc_open("./data/nceiErsstv5_6fc3_2e06_d3bf_1.nc")
+# nc <- nc_open("./data/nceiErsstv5_6fc3_2e06_d3bf_1.nc")
+
+# nc <- nc_open("./data/nceiErsstv5_554f_c21d_1d93.nc")
 
 # nc <- nc_open("./data/nceiErsstv5_0acf_1348_bf9d.nc")
 # 1980-2020 GOA version:
@@ -98,16 +100,21 @@ annual.wSST.jan.jun <- tapply(rowMeans(jan.jun.wSST, na.rm = T), jan.jun.yr, mea
 winter.months <- c("Nov", "Dec", "Jan", "Feb", "Mar")
 
 winter.Wsst <- wSST[m %in% winter.months,]
-winter.year <- yr[m %in% winter.months]
+winter.year <- as.numeric(as.character(yr[m %in% winter.months]))
+winter.months <- m[m %in% winter.months]
+winter.year.adjusted <- if_else(winter.months %in% c("Nov", "Dec"), winter.year+1, winter.year)
 
 
-
+# average by year
+winter.wSST <- tapply(rowMeans(winter.Wsst, na.rm = T), winter.year.adjusted, mean)
+winter.wSST <- winter.wSST[names(winter.wSST) %in% 1950:2022]
 
 # save
-save.dat <- data.frame(year = 1947:2022, sst = annual.wSST.jan.jun)
+save.dat <- data.frame(year = 1950:2022, sst = annual.wSST.jan.jun)
 write.csv(save.dat, "./data/annual.wSST.jan.jun.csv")
 
-
+save.dat <- data.frame(year = 1950:2022, sst = winter.wSST)
+write.csv(save.dat, "./data/annual.wSST.winter.csv")
 
 # calculate monthly anomaly
 # remove seasonal means
