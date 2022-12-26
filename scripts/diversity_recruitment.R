@@ -70,6 +70,15 @@ plot(shann_mod2$gam, residuals = T, pch = 19)
 summary(shann_mod2$gam)
 anova(shann_mod2$gam)
 
+# refit as linear model
+library(nlme)
+library(lmerTest)
+linear_mod1 <- gls(diversity ~ lag.sst3, correlation = corAR1(), 
+                    data = observer_shannon_dat)
+
+summary(linear_mod1)
+
+rcompanion::nagelkerke(linear_mod1)
 # combine and plot
 
 acoust_ts <- acoustic_shann_dat %>%
@@ -157,66 +166,75 @@ dev.off()
 
 # load data
 
-d1 <- read.csv("./data/pollock_recruitment_2021_assessment.csv")
+d1 <- read.csv("./data/pollock_recruitment_2022_assessment.csv")
 
 recr <- d1 %>%
   rename(recr = R0) %>%
-  mutate(recr = log(recr))
+  mutate(recr = log(recr)) %>%
+  filter(year <= 2020) # dropping most recent year b/c of poor data support
 
 # best SST covariate is winter SST year of and year before sampling
 # load sst
-sst <- read.csv("./data/western.goa.sst.1950.2022.csv")
+# sst <- read.csv("./data/western.goa.sst.1950.2022.csv")
+# sst <- read.csv("./data/annual.wSST.jan.jun.csv", row.names = 1)
+sst <- read.csv("./data/annual.wSST.winter.csv", row.names = 1)
+# # process
+# sst <- sst %>%
+#   filter(name == "Annual") %>%
+#   rename(sst = value) %>%
+#   select(-name) %>%
+#   mutate(sst.2 = zoo::rollmean(sst, 2, align = "right", fill = NA),
+#          sst.3 = zoo::rollmean(sst, 3, align = "right", fill = NA))
 
-# process
 sst <- sst %>%
-  filter(name == "Annual") %>%
-  rename(sst = value) %>%
-  select(-name) %>%
   mutate(sst.2 = zoo::rollmean(sst, 2, align = "right", fill = NA),
          sst.3 = zoo::rollmean(sst, 3, align = "right", fill = NA))
 
+
 recr <- left_join(recr, sst)
 
+ggplot(recr, aes(year, recr)) +
+  geom_point() +
+  geom_line()
+
+ggplot(recr, aes(sst, recr)) +
+  geom_text(aes(label = year))
 
 # now fit models
 
-recr_mod1 <- gamm(recr ~  s(sst,  k=5), 
+recr_mod1 <- gamm(recr ~  s(sst), 
                    correlation = corAR1(), data=recr)
 
-recr_mod2 <- gamm(recr ~  s(sst.2,  k=5), 
-                   correlation = corAR1(), data=recr)
-
-recr_mod3 <- gamm(recr ~  s(sst.3,  k=5), 
-                   correlation = corAR1(), data=recr)
-
-MuMIn::AICc(recr_mod1$lme, recr_mod2$lme, recr_mod3$lme) # model 2 is best
-
-# save AIC results
-recr_aic <- data.frame(winter.sst = c("1 yr", "2 yr", "3 yr"),
-                       AICc = MuMIn::AICc(recr_mod1$lme, recr_mod2$lme, recr_mod3$lme))
-
-# check best model
 gam.check(recr_mod1$gam)
 plot(recr_mod1$gam, residuals = T, pch = 19)
 summary(recr_mod1$gam)
 anova(recr_mod1$gam)
 
+recr_mod2 <- gamm(recr ~  s(sst.2), 
+                  correlation = corAR1(), data=recr)
+
+plot(recr_mod2$gam, residuals = T, pch = 19)
+summary(recr_mod2$gam) # poor model!
+anova(recr_mod1$gam)
+
+
+
 # plot
 
-recr_ts <- ggplot(recr, aes(year, Estimate)) +
+recr_ts <- ggplot(recr, aes(year, recr)) +
   geom_line() +
   geom_point() + 
   theme(axis.title.x = element_blank()) +
   ylab("Log(recruits)") 
   
 
-new.dat <- data.frame(sst.2 = seq(min(recr$sst.2),
-                                  max(recr$sst.2), 
+new.dat <- data.frame(sst = seq(min(recr$sst),
+                                  max(recr$sst), 
                                   length.out = 100))
 
-pred.recr <- predict(recr_mod2, newdata = new.dat, se.fit = T)
+pred.recr <- predict(recr_mod1, newdata = new.dat, se.fit = T)
 
-plot_pred <- data.frame(sst = new.dat$sst.2,
+plot_pred <- data.frame(sst = new.dat$sst,
                         estimate = pred.recr$fit,
                         LCI = pred.recr$fit - 1.96*pred.recr$se.fit,
                         UCI = pred.recr$fit + 1.96*pred.recr$se.fit)
@@ -225,14 +243,15 @@ plot_pred <- data.frame(sst = new.dat$sst.2,
 recr_sst <- ggplot(plot_pred, aes(sst, estimate)) +
   geom_line() +
   geom_ribbon(aes(ymin = LCI, ymax = UCI), alpha = 0.2) +
-  geom_point(data = recr, aes(sst.2, Estimate)) +
+  geom_text(data = recr, aes(sst, recr, label = year), size = 3) +
   labs(y = "Log(recruits)",
        x = "SST (°C)") +
-  scale_x_continuous(breaks = seq(4, 6.5, 0.5))
+  scale_x_continuous(minor_breaks = NULL) +
+  scale_y_continuous(breaks = seq(2, 10, 1), minor_breaks = NULL)
 
 # and plot
 
-png("./figs/recr_sst.png", width = 4, height = 5.5, units = "in", res = 300) 
+png("./figs/recr_sst.png", width = 5, height = 7, units = "in", res = 300) 
 
 ggpubr::ggarrange(recr_ts, recr_sst, ncol = 1, labels = "auto")
 
