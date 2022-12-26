@@ -296,6 +296,12 @@ plot_mature <- dat %>%
   mutate(proportion = count / sum(count)) %>%
   na.omit()
 
+# sum 4-9
+sum_check <- plot_mature %>%
+  filter(Age %in% 4:9)
+
+sum(sum_check$proportion)
+
 ggplot(filter(plot_mature, Age < 22), aes(as.factor(Age), proportion)) +
   geom_col(fill = "grey90", color="black", position = "dodge", width = 0.9) + 
   geom_hline(yintercept = 0) +
