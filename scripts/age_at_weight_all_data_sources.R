@@ -293,6 +293,14 @@ dat$sex.code <- if_else(dat$Sex == 1, 1,
                                 if_else(dat$Sex == "Male", 1, 
                                         ifelse(dat$Sex == "Female", 2, NA))))
 
+# evaluate proportion for each age
+prop_age <- dat %>%
+  group_by(Age) %>%
+  summarise(total = n())
+
+prop_age
+
+filter(dat, Age == 1)
 
 # now need to scale weights by age and maturity stage
 
@@ -354,8 +362,65 @@ ggplot(mature.weights, aes(Age)) +
   geom_histogram() +
   facet_wrap(~year.class)
 
+## add immatures (age 1-3)---------------
+
+immature.weights <- dat %>%
+  dplyr::filter(maturity_table_3 %in% 1:2,
+                Age %in% 1:3,
+                sex.code %in% 1:2,
+                Longitude < -150 & Longitude > -158)
+
+# log transform weight
+immature.weights$log.weight <- log(immature.weights$weight)
+
+# check for NAs (age 7 below is plotting as no data)
+check <- is.na(immature.weights$log.weight)
+sum(check)
+
+# dplyr::filter(immature.weights, Age == 7)
+# immature.weights[which.min(immature.weights$log.weight),] # one value of weight = 0!!
+
+immature.weights <- immature.weights %>%
+  dplyr::filter(weight > 0)
+
+# need to scale weight by age and sex
+females <- immature.weights %>%
+  dplyr::filter(sex.code == 2)
+
+males <- immature.weights %>%
+  dplyr::filter(sex.code == 1)
+
+
+female.weights <- plyr::ddply(females, "Age", transform, sc.weight = scale(log.weight))
+
+male.weights <- plyr::ddply(males, "Age", transform, sc.weight = scale(log.weight))
+
+
+immature.weights <- rbind(female.weights, male.weights)
+
+# check
+ggplot(immature.weights, aes(log.weight, sc.weight, color = as.factor(sex.code))) +
+  geom_point() +
+  facet_wrap(~Age, scales = "free")
+
+ggplot(immature.weights, aes(sc.weight)) +
+  geom_histogram(fill = "grey", color = "black", bins = 40) +
+  facet_wrap(~sex.code, scales = "free", ncol = 1)
+
+# assign year class
+levels(immature.weights$year)
+immature.weights$year <- as.numeric(as.character(immature.weights$year))
+
+immature.weights$year.class <- immature.weights$year - immature.weights$Age
+
+# plot to check
+ggplot(immature.weights, aes(Age)) +
+  geom_histogram() +
+  facet_wrap(~year.class)
+
+#############
 # clean up
-all.dat <- mature.weights %>%
+all.dat <- rbind(mature.weights, immature.weights) %>%
   select(-DateTime, -Sex)
 
 # set factors
@@ -407,7 +472,14 @@ acoustic_loc <- dat_lag %>%
   rename(lat = Latitude,
          long = Longitude) %>%
   select(data, lat, long)
+
+# check
+check_combo <- dat_lag %>%
+  group_by(Age, maturity_table_3) %>%
+  summarise(count = n())
   
+View(check_combo)
+
 
 # model - separate smooths to each age
 mod1 <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by = age.factor, k=4) + maturity_table_3,
@@ -454,7 +526,7 @@ MuMIn::r.squaredGLMM(linear_mod1)
 new.dat.mod1 <- data.frame(prevyr_annual.wSST = seq(min(dat_lag$prevyr_annual.wSST),
                                                max(dat_lag$prevyr_annual.wSST),
                                                length.out = 100),
-                      age.factor = as.factor(rep(4:10, each = 100)),
+                      age.factor = as.factor(rep(1:10, each = 100)),
                       maturity_table_3 = round(mean(as.numeric(as.character(dat_lag$maturity_table_3, 0)))))
 
 effects_age <- effects::effect(term= "prevyr_annual.wSST:age.factor", mod= linear_mod1,
