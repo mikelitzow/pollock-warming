@@ -327,7 +327,7 @@ mature.weights[which.min(mature.weights$log.weight),] # one value of weight = 0!
 mature.weights <- mature.weights %>%
   dplyr::filter(weight > 0)
 
-# need to scale weight by age and sex
+# need to scale weight by age and sex (and maturity stage)
 females <- mature.weights %>%
   dplyr::filter(sex.code == 2)
 
@@ -335,9 +335,9 @@ males <- mature.weights %>%
   dplyr::filter(sex.code == 1)
 
 
-female.weights <- plyr::ddply(females, "Age", transform, sc.weight = scale(log.weight))
+female.weights <- plyr::ddply(females, c("Age", "maturity_table_3"), transform, sc.weight = scale(log.weight))
 
-male.weights <- plyr::ddply(males, "Age", transform, sc.weight = scale(log.weight))
+male.weights <- plyr::ddply(males, c("Age", "maturity_table_3"), transform, sc.weight = scale(log.weight))
 
 
 mature.weights <- rbind(female.weights, male.weights)
@@ -391,9 +391,9 @@ males <- immature.weights %>%
   dplyr::filter(sex.code == 1)
 
 
-female.weights <- plyr::ddply(females, "Age", transform, sc.weight = scale(log.weight))
+female.weights <- plyr::ddply(females, c("Age", "maturity_table_3"), transform, sc.weight = scale(log.weight))
 
-male.weights <- plyr::ddply(males, "Age", transform, sc.weight = scale(log.weight))
+male.weights <- plyr::ddply(males, c("Age", "maturity_table_3"), transform, sc.weight = scale(log.weight))
 
 
 immature.weights <- rbind(female.weights, male.weights)
@@ -478,7 +478,7 @@ check_combo <- dat_lag %>%
   group_by(Age, maturity_table_3) %>%
   summarise(count = n())
   
-View(check_combo)
+# View(check_combo)
 
 
 # model - separate smooths to each age
@@ -511,12 +511,16 @@ AIC(mod1_acoustic$mer, mod2_acoustic$mer) # mod1 (age-specific smooths) is best
 
 # refit best formulation as a linear mixed model
 library(lmerTest)
+library(optimx)
 
-linear_mod1 <- lmer(sc.weight ~ prevyr_annual.wSST:age.factor + maturity_table_3 +
+# increase iterations to aid convergence
+control = lmerControl(optCtrl = list(maxfun = 2e6, method = "bobyqa"))
+
+linear_mod1 <- lmer(sc.weight ~ prevyr_annual.wSST:age.factor + #maturity_table_3 +
                (1|year.factor/haul.factor) + (1|cohort), 
              data = dat_lag)
 
-fixef(linear_mod1)
+# fixef(linear_mod1)
 summary(linear_mod1)
 
 MuMIn::r.squaredGLMM(linear_mod1)
@@ -578,8 +582,8 @@ plot_dat_acoustic <- plot_dat_acoustic %>%
 #                        LCI = pred_mod1$fit-1.96*pred_mod1$se.fit)
                        
 
-plot_order <- data.frame(Age = c("Age 4", "Age 5", "Age 6", "Age 7", "Age 8", "Age 9", "Age 10"),
-                         order = 1:7)
+plot_order <- data.frame(Age = c("Age 1", "Age 2", "Age 3", "Age 4", "Age 5", "Age 6", "Age 7", "Age 8", "Age 9", "Age 10"),
+                         order = 1:10)
 
 
 plot_dat_acoustic <- left_join(plot_dat_acoustic, plot_order)
@@ -603,7 +607,7 @@ ggsave("./figs/sst_vs_weight-age_acoustic_trawl.png", width = 6, height = 5.3, u
 # save data for rug plot
 rug_acoustic <- data.frame(data = "Acoustic trawl", 
                            sst = unique(dat_lag$prevyr_annual.wSST),
-                           age = rep(c("Age 4", "Age 5", "Age 6", "Age 7", "Age 8", "Age 9", "Age 10"), 
+                           age = rep(c("Age 1", "Age 2", "Age 3", "Age 4", "Age 5", "Age 6", "Age 7", "Age 8", "Age 9", "Age 10"), 
                                      each = length(unique(dat_lag$prevyr_annual.wSST))))
 
 ## load observer data---------------
@@ -796,7 +800,7 @@ head(plot_dat_observer)
 plot_dat_seine$age = "Age 0"
 plot_dat_seine$data = "Beach seine"
 
-names(plot_dat_acoustic)[3] = "LCI"
+names(plot_dat_acoustic)[3] = "effect"
 plot_dat_acoustic$data = "Acoustic trawl"
 
 names(plot_dat_observer)[2:3] <- c("age", "effect")
@@ -812,8 +816,8 @@ plot_all <- rbind(plot_dat_seine,
                   plot_dat_acoustic,
                   plot_dat_observer)
 
-plot_order <- data.frame(age = c("Age 0", "Age 2", "Age 3", "Age 4", "Age 5", "Age 6", "Age 7", "Age 8", "Age 9", "Age 10"),
-                         order = 1:10)
+plot_order <- data.frame(age = c("Age 0", "Age 1", "Age 2", "Age 3", "Age 4", "Age 5", "Age 6", "Age 7", "Age 8", "Age 9", "Age 10"),
+                         order = 1:11)
 
 plot_all <- left_join(plot_all, plot_order)
 
@@ -835,7 +839,7 @@ rug_all <- left_join(rug_all, plot_order)
 
 rug_all$age <- reorder(rug_all$age, rug_all$order)
 
-my.col <- cb[c(4,2,6)]
+my.col <- cb[c(4,7,6)]
 
 plot <- ggplot(plot_all, aes(sst, effect, fill = data, color = data)) +
   geom_hline(yintercept = 0, lty = 2) +
@@ -843,13 +847,13 @@ plot <- ggplot(plot_all, aes(sst, effect, fill = data, color = data)) +
   geom_ribbon(aes(ymin = LCI, ymax = UCI), alpha = 0.2, lty = 0) +
   labs(x = "SST (°C)",
        y = "Log weight anomaly") +
-  geom_rug(data = rug_all, aes(x = sst, y = NULL))  +
+  geom_rug(data = rug_all, aes(x = sst, y = NULL), color = "black")  +
   facet_wrap(~age, scales = "free_x", ncol = 4) +
   theme(legend.title = element_blank()) + 
   scale_color_manual(values = my.col) +
   scale_fill_manual(values = my.col)
 
-png("./figs/combined_sst_weight_age_plot.png", width = 6, height = 5, units = 'in', res = 300)
+png("./figs/combined_sst_weight_age_plot.png", width = 6.5, height = 5, units = 'in', res = 300)
 plot2 <-  reposition_legend(plot, position = 'top right', panel='panel-4-3')
 dev.off()
 
