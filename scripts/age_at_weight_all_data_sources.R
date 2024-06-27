@@ -327,6 +327,13 @@ mature.weights[which.min(mature.weights$log.weight),] # one value of weight = 0!
 mature.weights <- mature.weights %>%
   dplyr::filter(weight > 0)
 
+# check age - sex - maturity combinations
+check_mature <- mature.weights %>%
+  group_by(Age, sex.code, maturity_table_3) %>%
+  summarise(count = n())
+
+# View(check_mature) # looks good
+
 # need to scale weight by age and sex (and maturity stage)
 females <- mature.weights %>%
   dplyr::filter(sex.code == 2)
@@ -335,9 +342,9 @@ males <- mature.weights %>%
   dplyr::filter(sex.code == 1)
 
 
-female.weights <- plyr::ddply(females, c("Age", "maturity_table_3"), transform, sc.weight = scale(log.weight))
+female.weights <- plyr::ddply(females, "Age", transform, sc.weight = scale(log.weight))
 
-male.weights <- plyr::ddply(males, c("Age", "maturity_table_3"), transform, sc.weight = scale(log.weight))
+male.weights <- plyr::ddply(males, "Age", transform, sc.weight = scale(log.weight))
 
 
 mature.weights <- rbind(female.weights, male.weights)
@@ -383,6 +390,13 @@ sum(check)
 immature.weights <- immature.weights %>%
   dplyr::filter(weight > 0)
 
+# check totals
+check_immature <- immature.weights %>%
+  group_by(Age, sex.code, maturity_table_3) %>%
+  summarise(count = n())
+
+check_immature
+
 # need to scale weight by age and sex
 females <- immature.weights %>%
   dplyr::filter(sex.code == 2)
@@ -391,9 +405,9 @@ males <- immature.weights %>%
   dplyr::filter(sex.code == 1)
 
 
-female.weights <- plyr::ddply(females, c("Age", "maturity_table_3"), transform, sc.weight = scale(log.weight))
+female.weights <- plyr::ddply(females, "Age", transform, sc.weight = scale(log.weight))
 
-male.weights <- plyr::ddply(males, c("Age", "maturity_table_3"), transform, sc.weight = scale(log.weight))
+male.weights <- plyr::ddply(males, "Age", transform, sc.weight = scale(log.weight))
 
 
 immature.weights <- rbind(female.weights, male.weights)
@@ -513,17 +527,27 @@ AIC(mod1_acoustic$mer, mod2_acoustic$mer) # mod1 (age-specific smooths) is best
 library(lmerTest)
 library(optimx)
 
-# increase iterations to aid convergence
-control = lmerControl(optCtrl = list(maxfun = 2e6, method = "bobyqa"))
 
-linear_mod1 <- lmer(sc.weight ~ prevyr_annual.wSST:age.factor + #maturity_table_3 +
-               (1|year.factor/haul.factor) + (1|cohort), 
+linear_mod1 <- lmer(sc.weight ~ prevyr_annual.wSST:age.factor +
+               (1|year.factor/haul.factor) + (1|cohort) + (1|maturity_table_3), 
              data = dat_lag)
+
+
 
 # fixef(linear_mod1)
 summary(linear_mod1)
 
 MuMIn::r.squaredGLMM(linear_mod1)
+
+## compare with model invoking a single SST effect on all ages
+
+linear_mod2 <- lmer(sc.weight ~ prevyr_annual.wSST + #maturity_table_3 +
+                      (1|year.factor/haul.factor) + (1|cohort) + (1|maturity_table_3), 
+                    data = dat_lag)
+
+summary(linear_mod2)
+
+MuMIn::r.squaredGLMM(linear_mod2)
 
 # plot mod1 and mod2 predicted effects on one multi-panel plot
 
