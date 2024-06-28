@@ -39,10 +39,7 @@ names(dat) <- str_to_lower(names(dat))
 # add julian day
 dat$julian <- lubridate::yday(lubridate::parse_date_time(dat$date, orders="mdy"))
 
-# save julian day for combined histogram
 
-seine_hist <- data.frame(data = "Beach seine",
-                         julian = dat$julian)
 
 
 # save lat/long for site fig
@@ -154,6 +151,18 @@ bay_year <- bay_year %>%
 bay_year
 
 length(unique(dat$station_fac))
+
+# check sample sizes
+seine_n <- data.frame(Age = 0,
+                      "Beach seine" = nrow(dat)) 
+
+seine_n
+
+# save julian day for combined histogram
+
+seine_hist <- data.frame(data = "Beach seine",
+                         julian = dat$julian)
+
 
 # ready to analyze!!
 
@@ -445,6 +454,13 @@ all.dat$cohort <- as.factor(all.dat$year.class)
 all.dat$year.factor <- as.factor(all.dat$year)
 all.dat$haul.factor <- as.factor(all.dat$Haul)
 
+# check sample sizes
+acoustic_trawl_n <- all.dat %>%
+  group_by(Age) %>%
+  summarise(`Acoustic trawl` = n()) 
+
+acoustic_trawl_n
+
 ## lag annual sst
 # load sst data
 sst_lagged <- read.csv("./data/western.goa.sst.csv")
@@ -527,8 +543,15 @@ AIC(mod1_acoustic$mer, mod2_acoustic$mer) # mod1 (age-specific smooths) is best
 library(lmerTest)
 library(optimx)
 
+# add immature / mature designation for modeling
 
-linear_mod1 <- lmer(sc.weight ~ prevyr_annual.wSST:age.factor +
+dat_lag <- dat_lag %>%
+  mutate(age_group = as.factor(if_else(Age %in% 1:3,
+                                       "Age_1-3",
+                                       "Age_4-10")))
+
+
+linear_mod1 <- lmer(sc.weight ~ prevyr_annual.wSST:age.factor + 
                (1|year.factor/haul.factor) + (1|cohort) + (1|maturity_table_3), 
              data = dat_lag)
 
