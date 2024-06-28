@@ -749,6 +749,13 @@ ggplot(dat_lag, aes(prevyr_annual.wSST, sc.weight)) +
 observer_hist <- data.frame(data = "Commercial catch",
                          julian = dat_lag$julian)
 
+# check sample sizes
+observer_n <- dat_lag %>%
+  group_by(AGE) %>%
+  summarise(`Commercial catch` = n()) %>%
+  rename(Age =  AGE)
+
+observer_n
 
 # save lat-long for maps
 observer_loc <- data.frame(data = "Commercial catch",
@@ -761,6 +768,8 @@ obs_mean_mod <- lmer(log_weight ~ year.factor + (1|haul.factor),
 
 effects_mean <- effects::effect(term= "year.factor", mod = obs_mean_mod)
 summary(effects_mean)
+
+
 
 # try linear mixed-effects model
 library(lmerTest)
@@ -1008,3 +1017,10 @@ ggplot(data = world) +
   theme(axis.title = element_blank())
 
 ggsave("./figs/weight_study_site_maps.png", width = 4, height = 7, units = 'in')
+
+# sample size by age class table
+
+all_n <- full_join(seine_n, acoustic_trawl_n) %>%
+  full_join(., observer_n)
+
+write.csv(all_n, "./output/sample_size_by_age.csv", row.names = F)
