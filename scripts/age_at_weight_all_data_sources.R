@@ -87,6 +87,13 @@ ggplot(dat, aes(julian, length)) +
 
 # yes, < 100 mm will segregate age-0
 
+## check age-1 dynamics
+age_1  <- dat %>%
+  filter(length >= 100)
+
+# only 2019 data (and one 2020) - no ability to evaluate interannual sst effects!
+
+
 # remove age-1
 
 dat <- dat %>%
