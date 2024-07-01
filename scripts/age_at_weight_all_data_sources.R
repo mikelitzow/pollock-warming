@@ -1061,3 +1061,4 @@ all_n <- full_join(seine_n, acoustic_trawl_n) %>%
   full_join(., observer_n)
 
 write.csv(all_n, "./output/sample_size_by_age.csv", row.names = F)
+
