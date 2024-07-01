@@ -318,6 +318,11 @@ prop_age
 
 filter(dat, Age == 1)
 
+# check age and maturity combinations
+age_mat <- dat %>%
+  group_by(Age, maturity_table_3) %>%
+  summarise(total = n())
+
 # now need to scale weights by age and maturity stage
 
 # first, clean up - only known sex, known age, age 4-10,
@@ -325,7 +330,7 @@ filter(dat, Age == 1)
 # longitude 158 - 150 W (Shelikof and Kodiak)
 
 mature.weights <- dat %>%
-  dplyr::filter(maturity_table_3 %in% 2:5,
+  dplyr::filter(maturity_table_3 %in% 1:5,
          Age %in% 4:10,
          sex.code %in% 1:2,
          Longitude < -150 & Longitude > -158)
@@ -387,11 +392,31 @@ ggplot(mature.weights, aes(Age)) +
 
 ## add immatures (age 1-3)---------------
 
-immature.weights <- dat %>%
-  dplyr::filter(maturity_table_3 %in% 1:2,
+# change maturity = NA for age 1 to immature
+temp.dat <- dat
+
+change <- temp.dat$Age == 1 & is.na(temp.dat$maturity_table_3) == T
+
+temp.dat$maturity_table_3[change==T] <- 1
+
+# change all age 1 to sex = 3 (unsexed)
+change2 <- temp.dat$Age == 1
+
+temp.dat$sex.code[change2 == T] <- 3
+
+
+immature.weights <- temp.dat %>%
+  dplyr::filter(maturity_table_3 %in% 1:5,
                 Age %in% 1:3,
-                sex.code %in% 1:2,
+                sex.code %in% 1:3,
                 Longitude < -150 & Longitude > -158)
+
+# and check
+check <- immature.weights %>%
+  group_by(Age, maturity_table_3) %>%
+  summarise(total = n())
+
+View(temp.dat[temp.dat$Age == 1 & temp.dat$maturity_table_3 == 1,])
 
 # log transform weight
 immature.weights$log.weight <- log(immature.weights$weight)
@@ -414,19 +439,24 @@ check_immature <- immature.weights %>%
 check_immature
 
 # need to scale weight by age and sex
+unsexed <- immature.weights %>%
+  dplyr::filter(sex.code == 3)
+
 females <- immature.weights %>%
   dplyr::filter(sex.code == 2)
 
 males <- immature.weights %>%
   dplyr::filter(sex.code == 1)
 
+unsexed.weights <- plyr::ddply(unsexed, "Age", transform, sc.weight = scale(log.weight))
 
 female.weights <- plyr::ddply(females, "Age", transform, sc.weight = scale(log.weight))
 
 male.weights <- plyr::ddply(males, "Age", transform, sc.weight = scale(log.weight))
 
 
-immature.weights <- rbind(female.weights, male.weights)
+immature.weights <- rbind(female.weights, male.weights) %>%
+  rbind(., unsexed.weights)
 
 # check
 ggplot(immature.weights, aes(log.weight, sc.weight, color = as.factor(sex.code))) +
