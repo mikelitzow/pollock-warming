@@ -48,6 +48,18 @@ ggplot(dat, aes(AGE, WEIGHT)) +
   facet_wrap(~YEAR) +
   geom_smooth(method="gam", color="red", formula = y ~ s(x, k = 5))
 
+# proportion by age for the whole time series
+obs_age_proportion <- dat %>%
+  group_by(AGE) %>% 
+  summarise(count = n()) %>%
+  mutate(proportion = count / sum(count))
+
+ggplot(obs_age_proportion, aes(AGE, proportion)) +
+  geom_col(fill = "grey")
+
+# proportion 3 or older
+1 - sum(obs_age_proportion$proportion[1:2])
+
 # look at julian day by year
 dat$julian <- lubridate::yday(chron::dates(dat$HAUL_DATE))
 
