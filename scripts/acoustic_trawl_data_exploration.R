@@ -288,27 +288,7 @@ ggplot(filter(spawn.prespawn, maturity_table_3 == 4,
 # calculate the proportion of developing / pre-spawning / spawning / spent 
 # that are in the dominant year class each year (and sample size!)
 
-# plot histogram of all mature------------
-plot_mature <- dat %>%
-  filter(maturity_table_3 %in% 3:5) %>%
-  group_by(Age) %>%
-  summarize(count = n()) %>%
-  mutate(proportion = count / sum(count)) %>%
-  na.omit()
 
-# sum 4-9
-sum_check <- plot_mature %>%
-  filter(Age %in% 4:9)
-
-sum(sum_check$proportion)
-
-ggplot(filter(plot_mature, Age < 22), aes(as.factor(Age), proportion)) +
-  geom_col(fill = "grey90", color="black", position = "dodge", width = 0.9) + 
-  geom_hline(yintercept = 0) +
-  labs(y = "Proportion",
-       x = "Age (years)")
-
-ggsave("./figs/spawning_age_distribution_all_years.png", width = 5, height = 3, units = 'in')
 
 plot_mature2 <- dat %>%
   filter(maturity_table_3 %in% 2:5,
