@@ -331,7 +331,7 @@ age_mat <- dat %>%
 
 mature.weights <- dat %>%
   dplyr::filter(maturity_table_3 %in% 1:5,
-         Age %in% 4:10,
+         Age >= 4,
          sex.code %in% 1:2,
          Longitude < -150 & Longitude > -158)
 
@@ -498,6 +498,35 @@ acoustic_trawl_n <- all.dat %>%
 
 acoustic_trawl_n
 
+### plot histogram of all mature------------
+
+# check maturity by age
+check <- all.dat %>%
+  group_by(Age, maturity_table_3) %>%
+  summarise(count = n()) 
+
+
+plot_mature <- all.dat %>%
+  filter(maturity_table_3 %in% 3:5) %>%
+  group_by(Age) %>%
+  summarize(count = n()) %>%
+  mutate(proportion = count / sum(count))
+
+
+# sum greater than 3
+sum_check <- plot_mature %>%
+  filter(Age > 3)
+
+sum(sum_check$proportion)
+
+ggplot(filter(plot_mature, Age < 22), aes(as.factor(Age), proportion)) +
+  geom_col(fill = "grey90", color="black", position = "dodge", width = 0.9) + 
+  geom_hline(yintercept = 0) +
+  labs(y = "Proportion",
+       x = "Age (years)")
+
+ggsave("./figs/spawning_age_distribution_all_years.png", width = 5, height = 3, units = 'in')
+
 ## lag annual sst
 # load sst data
 sst_lagged <- read.csv("./data/western.goa.sst.csv")
@@ -547,6 +576,9 @@ check_combo <- dat_lag %>%
   
 # View(check_combo)
 
+# finally, limit to ages <=10 to keep sample size reasonable across years
+dat_lag <- dat_lag %>%
+  filter(Age <= 10)
 
 # model - separate smooths to each age
 mod1 <- gamm4(sc.weight ~  s(prevyr_annual.wSST, by = age.factor, k=4) + maturity_table_3,
