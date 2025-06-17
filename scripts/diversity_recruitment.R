@@ -41,7 +41,10 @@ sst <- sst %>%
 # join to acoustic diversity data
 acoustic_shann_dat <- left_join(acoustic_shann_dat, sst)
 
+# and load comparison data set with 2012 cohort adjusted to mean size
+adj_acoustic_shann_dat <- read.csv("./output/shannon_diversity_adj_2012.csv")
 
+adj_acoustic_shann_dat <- left_join(adj_acoustic_shann_dat, sst)
 
 # now fit models
 
@@ -52,6 +55,15 @@ gam.check(shann_mod1$gam)
 plot(shann_mod1$gam, residuals = T, pch = 19)
 summary(shann_mod1$gam)
 anova(shann_mod1$gam)
+
+# and adjusted version (2012 cohort held at mean size)
+adj_shann_mod1 <- gamm(shannon ~  s(lag.sst3,  k=4), # 2020 diversity compared with 2017-2019 sst
+                   correlation = corAR1(), data = adj_acoustic_shann_dat)
+
+gam.check(adj_shann_mod1$gam)
+plot(adj_shann_mod1$gam, residuals = T, pch = 19)
+summary(adj_shann_mod1$gam)
+anova(adj_shann_mod1$gam)
 
 ## observer data
 
