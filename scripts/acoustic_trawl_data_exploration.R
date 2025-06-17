@@ -360,6 +360,94 @@ age.shannon <- age.diversity %>%
   group_by(year) %>%
   summarise(shannon = -sum(product))
 
+# aside - calculate diversity with 2012 year class set at average size
+
+cohort <- age.diversity %>%
+  mutate(cohort = as.factor(year - Age))
+
+
+ggplot(cohort, aes(year, count)) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~ cohort, scales = "free_y")
+
+# get # of hauls (effort) to calculate CPUE
+
+effort <- dat %>%
+  filter(maturity_table_3 %in% 2:5,
+         Age > 1) %>%
+  group_by(year) %>%
+  summarise(effort = length(unique(Haul)))
+
+cohort <- left_join(cohort, effort)
+
+cpue <- cohort %>%
+  select(-ln.proportion, -product) %>%
+  mutate(cpue = count/effort)
+  
+ggplot(cpue, aes(Age, cpue)) +
+  geom_col(fill = "grey") +
+  facet_wrap(~cohort)
+
+# limit to ages/year classes that are well observed for calculating mean cpue
+
+min(cpue$year)
+max(cpue$year)
+min(cpue$Age)
+print(cpue[cpue$year == 2020,])
+# use cohorts 1984-2016
+
+cpue_adjust <- cpue %>%
+  filter(cohort %in% 1984:2020) %>%
+  group_by(Age) %>%
+  summarise(mean_cpue = mean(cpue))
+
+cpue[cpue$cohort == 2012,]
+
+cpue_compare <- left_join(cpue_adjust, cpue[cpue$cohort == 2012,]) %>%
+  na.omit() %>%
+  mutate(adj_factor = mean_cpue/cpue) %>%
+  select(Age, adj_factor)
+
+
+# adjust 2012 cohort count values 
+
+adj_2012_count <- age.diversity %>%
+  mutate(cohort = year - Age) %>%
+  filter(cohort == 2012) %>%
+  left_join(cpue_compare) %>%
+  mutate(new_count = round(count*adj_factor,0))
+
+adj_age.diversity <- age.diversity %>%
+  mutate(cohort = as.factor(year - Age))
+
+adj_age.diversity$count[adj_age.diversity$cohort == 2012] <- 
+  adj_2012_count$new_count
+
+adj_year.total <- adj_age.diversity %>%
+  group_by(year) %>%
+  summarise(year.total = sum(count))
+
+adj_age.diversity <- left_join(adj_age.diversity, adj_year.total) %>%
+  mutate(proportion = count / year.total,
+         ln.proportion = log(proportion),
+         product = proportion*ln.proportion)
+
+# calculate adjusted age diversity
+adj_age.shannon <- adj_age.diversity %>%
+  group_by(year) %>%
+  summarise(shannon = -sum(product))
+
+ggplot(adj_age.shannon, aes(year, shannon)) +
+  geom_line() +
+  geom_point()
+
+ggplot(age.shannon, aes(year, shannon)) + 
+  geom_line() +
+  geom_point()
+
+##################
+
 plot.shannon <- data.frame(year = 1986:2020,
                            shannon = NA)
 
@@ -371,7 +459,7 @@ ggplot(plot.shannon, aes(year, shannon)) +
 
 
 # load sst as a covariate
-sst <- read.csv("./data/monthly.western.GOA.SST.anomalies.wrt.1980-2020.csv")
+sst <- read.csv("./data/monthly_western_GOA_SST_anomalies_wrt_1980-2020.csv")
 
 # now cross-correlate sst-diversity
 
@@ -476,28 +564,40 @@ ggplot(sst.annual, aes(year, sst)) +
   geom_line(aes(year, sst.2), color = "red")
 
 
-sst.annual <- left_join(sst.annual, age.shannon)
+sst.effects <- left_join(sst.annual, age.shannon)
 
-sst.annual <- sst.annual %>%
+sst.effects <- sst.effects %>%
   pivot_longer(cols = c(-year, -shannon))
 
-ggplot(sst.annual, aes(value, shannon)) +
+ggplot(sst.effects, aes(value, shannon)) +
   geom_point() +
   facet_wrap(~name)
 
 # compare predictive skill / model fit
 library(mgcv)
 
-sst.annual <- sst.annual %>%
+sst.effects <- sst.effects %>%
   pivot_wider(names_from = name)
 
-mod1 <- gam(shannon ~ s(sst, k = 4), data = sst.annual)
-mod2 <- gam(shannon ~ s(sst.2, k = 4), data = sst.annual)
-mod3 <- gam(shannon ~ s(sst.3, k = 4), data = sst.annual)
+mod1 <- gam(shannon ~ s(sst, k = 4), data = sst.effects)
+mod2 <- gam(shannon ~ s(sst.2, k = 4), data = sst.effects)
+mod3 <- gam(shannon ~ s(sst.3, k = 4), data = sst.effects)
 
 MuMIn::AICc(mod1, mod2, mod3) # ain't no denying - mod3 best by far
 summary(mod3)
 plot(mod3, residuals = T, pch = 19)
+
+## now with adjusted diversity
+
+adj_sst.annual <- left_join(sst.annual, adj_age.shannon)
+
+mod3_adj <- gam(shannon ~ s(sst.3, k = 4), data = adj_sst.annual)
+summary(mod3_adj)
+plot(mod3_adj, residuals = T, pch = 19)
+
+# save adj_age.shannon for later comparison
+write.csv(adj_age.shannon, "./output/shannon_diversity_adj_2012.csv",
+          row.names = F)
 
 # now need to scale weights by age and maturity stage
 
