@@ -222,15 +222,6 @@ plot(recr_mod1$gam, residuals = T, pch = 19)
 summary(recr_mod1$gam)
 anova(recr_mod1$gam)
 
-recr_mod2 <- gamm(recr ~  s(sst.2), 
-                  correlation = corAR1(), data=recr)
-
-plot(recr_mod2$gam, residuals = T, pch = 19)
-summary(recr_mod2$gam) # poor model!
-anova(recr_mod2$gam)
-
-
-
 # plot
 
 recr_ts <- ggplot(recr, aes(year, recr)) +
