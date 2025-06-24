@@ -134,7 +134,7 @@ acoustic_plot <- ggplot(pred_acoustic_dat, aes(sst, effect)) +
   geom_ribbon(aes(ymin = LCI, ymax = UCI), fill = cb[2], alpha = 0.2) +
   geom_point(data = acoustic_shann_dat, aes(lag.sst3, diversity), color = cb[2]) + 
   labs(y = "Shannon diversity",
-       x = "SST (°C)",
+       x = "Three-year running mean SST (°C)",
        title = "Acoustic trawl") 
 
 acoustic_plot
@@ -156,7 +156,7 @@ obs_shann_plot <- ggplot(pred_obs_dat, aes(sst, effect)) +
   geom_ribbon(aes(ymin = LCI, ymax = UCI), fill = cb[6], alpha = 0.2) +
   geom_point(data = observer_shannon_dat, aes(lag.sst3, diversity), color = cb[6]) + 
   labs(y = "Shannon diversity",
-       x = "SST (°C)",
+       x = "Three-year running mean SST (°C)",
        title = "Commercial catch") 
 
 obs_shann_plot
@@ -235,7 +235,7 @@ new.dat <- data.frame(sst = seq(min(recr$sst),
                                   max(recr$sst), 
                                   length.out = 100))
 
-pred.recr <- predict(recr_mod1, newdata = new.dat, se.fit = T)
+pred.recr <- predict(recr_mod1$gam, newdata = new.dat, se.fit = T)
 
 plot_pred <- data.frame(sst = new.dat$sst,
                         estimate = pred.recr$fit,
@@ -248,7 +248,7 @@ recr_sst <- ggplot(plot_pred, aes(sst, estimate)) +
   geom_ribbon(aes(ymin = LCI, ymax = UCI), alpha = 0.2) +
   geom_text(data = recr, aes(sst, recr, label = year), size = 3) +
   labs(y = "Log(recruits)",
-       x = "SST (°C)") +
+       x = "November-March SST (°C)") +
   scale_x_continuous(minor_breaks = NULL) +
   scale_y_continuous(breaks = seq(2, 10, 1), minor_breaks = NULL)
 
