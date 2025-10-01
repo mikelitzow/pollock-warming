@@ -137,6 +137,24 @@ ggplot(dat, aes(Age)) +
   geom_histogram(bins = 23) +
   facet_wrap(~year, scale = "free_y")
 
+# age distribution of all pre-spawning, spawning, and spent fish (Fig. 6)
+age.prop <- dat %>%
+  filter(maturity_table_3 %in% 3:5, 
+         Age %in% 1:21) %>%
+  group_by(Age) %>%
+  summarise(count = n()) %>%
+  mutate(Proportion = count / sum(count))
+
+
+ggplot(age.prop, aes(as.factor(Age), Proportion)) +
+  geom_col(fill = "#EBEBEB", color = "black") +
+  xlab("Age (years)") +
+  geom_hline(yintercept = 0)
+
+ggsave("./figs/spawner_age_proportion.png", width = 5, height = 3.5, units = 'in')
+
+sum(age.prop$Proportion[age.prop$Age %in% 4:9])
+sum(age.prop$Proportion)
 # age structure collapsed (?!)
 
 # examine just spawning fish < 15 years old
