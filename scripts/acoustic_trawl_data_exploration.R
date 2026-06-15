@@ -137,6 +137,13 @@ ggplot(dat, aes(Age)) +
   geom_histogram(bins = 23) +
   facet_wrap(~year, scale = "free_y")
 
+# plot maturity stage by year for young fish
+ggplot(dplyr::filter(dat, Age %in% 2:4), aes(year, maturity_table_3)) +
+  geom_point() +
+  geom_smooth() +
+  facet_wrap(~Age)
+
+
 # age distribution of all pre-spawning, spawning, and spent fish (Fig. 6)
 age.prop <- dat %>%
   filter(maturity_table_3 %in% 3:5, 
