@@ -5,6 +5,7 @@ library(mgcv)
 library(lme4)
 library(lemon)
 library(gamm4)
+library(MuMIn)
 
 theme_set(theme_bw())
 cb <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
@@ -192,10 +193,26 @@ mod2_seine <- gamm4(weight ~ s(julian, k = 5) + sst,
               random=~(1|bay_fac/station_fac), data = dat)
 
 summary(mod2_seine$gam)
+summary(mod2$lme)
 plot(mod2_seine$gam)
 
 
 MuMIn::AICc(mod1_seine$mer, mod2_seine$mer) # mod 1 (random station effects) best
+
+# refit best model as LME and extract R2 values
+# refit best formulation as a linear mixed model
+library(lmerTest)
+library(optimx)
+
+
+linear_seine_mod1 <- lmer(weight ~ julian + sst + (1|station_fac),
+                      data = dat)
+
+ # fixef(linear_mod1)
+summary(linear_seine_mod1)
+
+MuMIn::r.squaredGLMM(linear_seine_mod1)
+
 
 # save for AIC table
 seine_AIC <- data.frame(data = "Age-0 weight",
